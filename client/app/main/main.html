@@ -1,0 +1,64 @@
+<div ng-include="'components/navbar/navbar.html'"></div>
+
+<header class="hero-unit well-material-blue-100" id="banner">
+  <div class="container">
+
+    <img src="assets/images/ben33.svg" width="92" height="92"><br />
+    <h1 style="color: #000000;">
+      Ben33
+    </h1>
+    <p style="color: #000000;" class="lead">Internal Event Organizer</p>
+  </div>
+</header>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-8">
+      <h1 class="page-header">イベント</h1>
+      <div class="panel panel-material-blue" ng-repeat="event in awesomeThings">
+        <div class="panel-heading">
+          <h2 class="panel-title">
+            <a ng-href="#/detail/{{event.eventId}}">
+              {{event.eventId}}:{{event.title}}
+            </a>
+          </h2>
+        </div>
+        <div class="panel-body">
+          <img class="img-rounded" src="//lorempixel.com/120/90/people/{{$index}}" alt="icon" style="vertial-align:text-top;">
+          {{event.abstraction}}
+        </div>
+        <div class="panel-body">
+          開催日時：{{event.startDate}} ～ {{event.endDate}}<br />
+          開催場所：{{event.venue}}
+        </div>
+      </div>
+    </div><!-- col-md-8 -->
+    <div class="col-md-4">
+      <h2 class="page-header">新着情報</h2>
+      <div class="panel panel-material-pink">
+        <div class="panel-heading">
+          テスト
+        </div>
+        <div class="panel-body">
+          テスト
+        </div>
+      </div>
+
+      <div class="panel panel-material-pink">
+        <div class="panel-heading">
+          テスト
+        </div>
+        <div class="panel-body">
+          テスト
+        </div>
+      </div>
+    </div><!-- col-md-4 -->
+  </div><!-- row -->
+</div><!-- container -->
+
+<footer class="footer">
+  <div class="container">
+      <p>Ben33 | Copyright &copy; 2015 tamura shingo |
+      <a href="https://github.com/tamurashingo/ben33/issues?state=open">Issues</a></p>
+  </div>
+</footer>
