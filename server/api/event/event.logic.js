@@ -31,7 +31,8 @@
  *
  */
 
-var Promise = require('bluebird');
+var Showdown = require('showdown');
+var converter = new Showdown.converter();
 
 
 /**
@@ -67,9 +68,14 @@ console.log(pageNo);
       };
     }
   });
-}
+};
 
 exports.getEventIndex = function (requestParams) {
   var pageNo = requestParams.pageNo;
   return getEventModelAll(pageNo);
-}
+};
+
+exports.preview = function (txt) {
+console.log(txt);
+  return converter.makeHtml(txt);
+};

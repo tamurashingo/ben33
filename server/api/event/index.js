@@ -34,6 +34,13 @@ router.post('/', controller.regist);
  */
 router.put('/:eventId', controller.update);
 
+
+/**
+ * プレビュー
+ *
+ */
+router.post('/preview', controller.preview);
+
 module.exports = router;
 
 
