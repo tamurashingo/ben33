@@ -273,6 +273,11 @@ module.exports = function (grunt) {
     },
 
     svgmin: {
+      options: {
+        plugins: [
+          { transformsWithOnePath: false }
+        ]
+      },
       dist: {
         files: [{
           expand: true,
@@ -342,9 +347,11 @@ module.exports = function (grunt) {
           src: [
             '*.{ico,png,txt}',
             '.htaccess',
-            'bower_components/**/*',
+//            'bower_components/**/*',
             'assets/images/{,*/}*.{webp}',
             'assets/fonts/**/*',
+            'app/**/*.html',
+            'components/**/*.html',
             'index.html'
           ]
         }, {
@@ -359,6 +366,27 @@ module.exports = function (grunt) {
             'package.json',
             'server/**/*'
           ]
+        }, {
+// for bootstrap fonts
+          expand: true,
+          dot: true,
+          cwd: '<%= yeoman.client %>/bower_components/bootstrap/dist',
+          src: ['fonts/*.*'],
+          dest: '<%= yeoman.dist %>/public/assets'
+        }, {
+// for bootstrap-material-design fonts
+          expand: true,
+          dot: true,
+          cwd: '<%= yeoman.client %>/bower_components/bootstrap-material-design/dist',
+          src: ['fonts/*.*'],
+          dest: '<%= yeoman.dist %>/public/assets'
+        }, {
+// for font-awesome
+          expand: true,
+          dot: true,
+          cwd: '<%= yeoman.client %>/bower_components/font-awesome',
+          src: ['fonts/*.*'],
+          dest: '<%= yeoman.dist %>/public/assets'
         }]
       },
       styles: {

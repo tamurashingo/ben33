@@ -7,9 +7,9 @@ angular.module('ben33App', [
   'ui.router',
   'ui.bootstrap'
 ])
-  .config(function ($stateProvider, $urlRouterProvider, $locationProvider) {
+  .config(['$stateProvider', '$urlRouterProvider', '$locationProvider', function ($stateProvider, $urlRouterProvider, $locationProvider) {
     $urlRouterProvider
       .otherwise('/');
-
+$.material.init();
     $locationProvider.html5Mode(true);
-  });
+  }]);

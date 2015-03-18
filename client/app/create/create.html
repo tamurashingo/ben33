@@ -1,0 +1,78 @@
+<div ng-include="'components/navbar/navbar.html'"></div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <h1 class="page-header">イベント作成</h1>
+    </div>
+  </div><!-- row -->
+  <div class="row" ng-controller="CreateCtrl">
+    <div class="col-md-6">
+
+      <div class="well">
+        <form class="form-horizontal">
+          <fieldset>
+
+            <legend>下書き</legend>
+
+            <!-- イベント名 -->
+            <div class="form-group">
+              <label for="eventName" class="col-lg-2 control-label">イベント名</label>
+              <div class="col-lg-10">
+                <input type="text" class="form-control" id="eventName" ng-model="eventName">
+              </div>
+            </div>
+
+            <!-- 開始日時 -->
+            <div class="form-group">
+              <label for="startDate" class="col-lg-2 control-label">開始日時</label>
+              <div class="col-lg-10">
+                <input type="text" class="form-control" id="startDate" ng-model="startDate">
+              </div>
+            </div>
+
+            <!-- 終了日時 -->
+            <div class="form-group">
+              <label for="endDate" class="col-lg-2 control-label">終了日時</label>
+              <div class="col-lg-10">
+                <input type="text" class="form-control" id="endDate">
+              </div>
+            </div>
+
+            <hr />
+
+            <!-- イベント管理者 -->
+            <div class="form-group">
+              <label for="mgr" class="col-lg-2 control-label">イベント管理者</label>
+              <div class="col-lg-10">
+                <input type="text" class="form-control" id="mgr">
+              </div>
+            </div>
+
+            <hr />
+
+            <!-- イベント詳細 -->
+            <div class="form-group">
+              <label for="desc" class="col-lg-2 control-label">イベント詳細</label>
+              <div class="col-lg-10">
+                <textarea class="form-control" rows="5" id="desc" ng-model="desc"></textarea>
+              </div>
+            </div>
+          </fieldset>
+        </form>
+      </div><!-- well -->
+    </div><!-- col-md-6 -->
+    <div class="col-md-6">
+      <div class="well">
+        <form>
+          <legend>Preview</legend>
+          <div id="preview" ng-bind-html="preview">
+          </div>
+        </form>
+      </div>
+    </div><!-- col-md-6 -->
+  </div><!-- row -->
+</div><!-- container -->
+
+
+<div ng-include="'components/footer/footer.html'"></div>

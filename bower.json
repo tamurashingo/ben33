@@ -2,6 +2,7 @@
   "name": "ben33",
   "version": "0.0.0",
   "dependencies": {
+    "arrive": "~2.1.0",
     "angular": ">=1.2.*",
     "json3": "~3.3.1",
     "es5-shim": "~3.0.1",
