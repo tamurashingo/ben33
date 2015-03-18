@@ -1,10 +1,14 @@
 'use strict';
 
 angular.module('ben33App')
-  .controller('NavbarCtrl', function ($scope, $location) {
+  .controller('NavbarCtrl', ['$scope', '$location', function ($scope, $location) {
     $scope.menu = [{
-      'title': 'Home',
+      'title': 'イベント一覧',
       'link': '/'
+    },
+    {
+      'title': 'イベント作成',
+      'link': '/create'
     }];
 
     $scope.isCollapsed = true;
@@ -12,4 +16,4 @@ angular.module('ben33App')
     $scope.isActive = function(route) {
       return route === $location.path();
     };
-  });
+  }]);
