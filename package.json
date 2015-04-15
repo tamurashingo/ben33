@@ -28,7 +28,8 @@
     "sequelize": "~2.0.4",
     "serve-favicon": "~2.0.1",
     "sqlite3": "~3.0.5",
-    "showdown": "^0.4.0"
+    "showdown": "^0.4.0",
+    "date-utils": "^1.2.16"
   },
   "devDependencies": {
     "connect-livereload": "~0.4.0",

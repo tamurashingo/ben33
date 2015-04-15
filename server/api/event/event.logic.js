@@ -33,6 +33,10 @@
 
 var Showdown = require('showdown');
 var converter = new Showdown.converter();
+var models = require('../../models').models();
+var Promise = require('bluebird');
+var _ = require('lodash');
+require('date-utils');
 
 
 /**
@@ -44,38 +48,116 @@ var converter = new Showdown.converter();
  *
  */
 function getEventModelAll(pageNo) {
-var models = require('../../models').models();
-var Event = models.Event;
+  var Event = models.Event;
   return Event.findAndCountAll({
     offset: pageNo,
     limit: 10,
     order: 'eventId desc'
   })
-  .then(function (result) {
-console.log(pageNo);
-    if (pageNo * 10 + result.rows.length < result.count) {
+    .then(function (result) {
+      console.log("pageno :" + pageNo);
+      console.log("length :" + result.rows.length);
+      console.log("total  :" + result.count);
+      console.log("current:" + (pageNo + result.rows.length));
+    if (pageNo + result.rows.length < result.count) {
       return {
         prev: pageNo == 0 ? false : true,
         next: true,
-        result: result.rows
+        result: convertRows(result.rows),
+        total: Math.floor(result.count / 10) + 1
       };
     }
     else {
       return {
         prev: pageNo == 0 ? false : true,
         next: false,
-        result: result.rows
+        result: convertRows(result.rows),
+        total: Math.floor(result.count / 10) + 1
       };
     }
   });
 };
 
+
+function getDetail(eventId) {
+  var Event = models.Event,
+      Mgr = models.Mgr,
+      ret = {};
+  
+  return Event.find({where: {eventId: eventId}})
+    .then(function (event) {
+      console.log(event.dataValues);
+      ret = event.dataValues;
+      return Mgr.find({where: {mgrId: event.dataValues.mgrId}});
+    })
+    .then(function (mgr) {
+      console.log(mgr.dataValues);
+      ret.userName = mgr.dataValues.userName;
+      return new Promise(function (resolve) {
+        resolve(ret);
+      });
+    })
+  ;
+}
+
+
+
 exports.getEventIndex = function (requestParams) {
-  var pageNo = requestParams.pageNo;
+  var pageNo = parseInt(requestParams.pageNo, 10);
   return getEventModelAll(pageNo);
 };
 
-exports.preview = function (txt) {
-console.log(txt);
-  return converter.makeHtml(txt);
+exports.getEventDetail = function (requestParams) {
+  var eventId = requestParams.eventId;
+  return getDetail(eventId);
 };
+
+exports.preview = function (txt) {
+  return converter.makeHtml(txt);
+ };
+
+
+function convertRows(rows) {
+  var array = [];
+  _.each(rows, function (elm, index) {
+    array[index] = elm.dataValues;
+  });
+  
+  return array;
+}
+
+function registEvent (data, t) {
+  return models.Event.create(data.event,
+                             {transaction: t});
+}
+
+
+function registUser (data, t) {
+  return models.User.create(data.user,
+                            {transaction: t});
+}
+
+function registMgr (data, t) {
+  return models.Mgr.create(data.mgr,
+                           {transaction: t});
+};
+
+
+exports.regist = function (data) {
+  var sequelize = models.sequelize,
+      event = null;
+
+  return registEvent(data)
+    .then(function (result) {
+      event = result;
+      data.mgr.eventId = result.eventId;
+      return registMgr(data);
+    })
+    .then(function (result) {
+      return event.updateAttributes({
+        mgrId: result.mgrId
+      });
+    });
+};
+
+

@@ -17,11 +17,11 @@ module.exports = function (sequelize, DataTypes) {
     /** コメント */
     comment: DataTypes.STRING,
     /** 登録日時 */
-    createDate: DataTypes.DATE,
+    createDate: DataTypes.STRING,
     /** キャンセルフラグ */
     cancelFlag: DataTypes.BOOLEAN,
     /** キャンセル日時 */
-    cancelDate: DataTypes.DATE
+    cancelDate: DataTypes.STRING
   });
 
   return Attendee;

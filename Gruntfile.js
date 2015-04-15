@@ -243,8 +243,8 @@ module.exports = function (grunt) {
 
     // Performs rewrites based on rev and the useminPrepare configuration
     usemin: {
-      html: ['<%= yeoman.dist %>/public/{,**/}*.html'],
-      css: ['<%= yeoman.dist %>/public/{,**/}*.css'],
+      html: ['<%= yeoman.dist %>/public/{,*/}*.html'],
+      css: ['<%= yeoman.dist %>/public/{,*/}*.css'],
       js: ['<%= yeoman.dist %>/public/{,*/}*.js'],
       options: {
         assetsDirs: [
@@ -255,6 +255,9 @@ module.exports = function (grunt) {
         patterns: {
           js: [
             [/(assets\/images\/.*?\.(?:gif|jpeg|jpg|png|webp|svg))/gm, 'Update the JS to reference our revved images']
+          ],
+          css: [
+            [/()/g, 'Rplacing reference to FontFile']
           ]
         }
       }

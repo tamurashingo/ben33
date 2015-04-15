@@ -1,26 +1,24 @@
-<div ng-include="'components/navbar/navbar.html'"></div>
-
-<div class="container">
+<div class="container"  ng-controller="CreateCtrl">
+  <div growl></div>
+  
   <div class="row">
     <div class="col-md-12">
       <h1 class="page-header">イベント作成</h1>
     </div>
   </div><!-- row -->
-  <div class="row" ng-controller="CreateCtrl">
+  <div class="row">
     <div class="col-md-6">
-
       <div class="well">
-        <form class="form-horizontal">
+        <form name="eventForm" class="form-horizontal" novalidate>
           <fieldset>
 
             <legend>下書き</legend>
-            <div>*Markdown記法で記述できます</div>
 
             <!-- イベント名 -->
             <div class="form-group">
               <label for="eventName" class="col-lg-2 control-label">イベント名</label>
               <div class="col-lg-10">
-                <input type="text" class="form-control" id="eventName" ng-model="eventName">
+                <input type="text" class="form-control" id="eventName" ng-model="eventName" placeholder="イベント名(必須)" required>
               </div>
             </div>
 
@@ -54,7 +52,7 @@
             <div class="form-group">
               <label for="mgr" class="col-lg-2 control-label">イベント管理者</label>
               <div class="col-lg-10">
-                <input type="text" class="form-control" id="mgr" ng-model="mgr">
+                <input type="text" class="form-control" id="mgr" ng-model="mgr" placeholder="イベント管理者(必須)"　required>
               </div>
             </div>
 
@@ -72,9 +70,9 @@
 
             <!-- イベント詳細 -->
             <div class="form-group">
-              <label for="desc" class="col-lg-2 control-label">イベント詳細*</label>
+              <label for="desc" class="col-lg-2 control-label">イベント詳細</label>
               <div class="col-lg-10">
-                <textarea class="form-control" rows="25" id="desc" ng-model="desc"></textarea>
+                <textarea class="form-control" rows="5" id="desc" ng-model="desc"></textarea>
               </div>
             </div>
           </fieldset>
@@ -83,9 +81,14 @@
     </div><!-- col-md-6 -->
     <div class="col-md-6">
       <div class="well">
-        <form>
+        <form name="previewForm">
           <legend>Preview</legend>
           <div id="preview" ng-bind-html="preview">
+          </div>
+          <div align="right">
+            <button class="btn btn-material-pink-500 btn-raised" ng-click="regist()" ng-disabled="eventForm.$invalid || !registButton">
+              <span>作成</span>
+            </button>
           </div>
         </form>
       </div>
@@ -93,5 +96,3 @@
   </div><!-- row -->
 </div><!-- container -->
 
-
-<div ng-include="'components/footer/footer.html'"></div>

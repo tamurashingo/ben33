@@ -19,3 +19,19 @@ body {
     padding-top: 70px;
 }
 
+
+.growl {
+    position: fixed;
+    z-index: 5000;
+    top: 150px;
+    right: 10px;
+}
+
+.growl-item.ng-enter,
+.growl-item.ng-leave {
+    -webkit-transition: 0.5s ease all;
+     -moz-transition: 0.5s ease all;
+       -o-transition: 0.5s ease all;
+          transition: 0.5s ease all;
+}
+
