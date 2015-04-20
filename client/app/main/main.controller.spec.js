@@ -2,15 +2,18 @@
 
 describe('Controller: MainCtrl', function () {
   var MainCtrl,
-      scope;
+      scope,
+      stateParams;
 
   // load the controller's module
   beforeEach(module('ben33App'));
 
   beforeEach(inject(function ($controller, $rootScope) {
     scope = $rootScope.$new();
+    stateParams = {pageNo: 1};
     MainCtrl = $controller('MainCtrl', {
-      $scope: scope
+      $scope: scope,
+      $stateParams: stateParams
     });
   }));
 

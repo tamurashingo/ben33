@@ -16,7 +16,6 @@ angular.module('ben33App')
       // TODO: 将来的には Number.isNaN に置き換える
       if (isNaN(pageNo)) {
         $location.url('/1');
-        pageNo = 1;
       }
       $scope.pageNo = pageNo;
     })();
