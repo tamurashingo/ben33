@@ -7,7 +7,6 @@ describe('Utilサービス', function () {
   beforeEach(inject(function () {
     var $injector = angular.injector(['ben33App']);
     Util = $injector.get('Util');
-    console.log(Util);
   }));
 
 

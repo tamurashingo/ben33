@@ -41,18 +41,53 @@ describe('Controller: DetailCtrl', function () {
       });
     }));
 
-    it('', function () {
+    it('イベントIDが設定されていること', function () {
       $httpBackend.flush();
-console.log('111');
-console.log(typeof(scope.detail));
-console.log(scope.detail);
-//      expect($(scope.detail)).toContain('h1');
-      
-//console.log(fixture);
-//      console.log(scope.detail);
+      jasmine.getFixtures().set(scope.detail);
+      expect($('p:first')).toContainText('event id:1');
     });
 
-  });
+    it('イベント名が設定されていること', function () {
+      $httpBackend.flush();
+      jasmine.getFixtures().set(scope.detail);
+      expect($('h1')).toContainText('イベント名');
+    });
 
+    it('開始日時が設定されていること', function () {
+      $httpBackend.flush();
+      jasmine.getFixtures().set(scope.detail);
+      expect($('h3:eq(0)')).toContainText('12:00');
+    });
+
+    it('終了日時が設定されていること', function () {
+      $httpBackend.flush();
+      jasmine.getFixtures().set(scope.detail);
+      expect($('h3:eq(0)')).toContainText('13:00');
+    });
+
+    it('開催場所が設定されていること', function () {
+      $httpBackend.flush();
+      jasmine.getFixtures().set(scope.detail);
+      expect($('h3:eq(1)')).toContainText('開催場所');
+    });
+
+    it('イベント管理者が設定されていること', function () {
+      $httpBackend.flush();
+      jasmine.getFixtures().set(scope.detail);
+      expect($('h4:eq(0)')).toContainText('イベント管理者');
+    });
+
+    it('イベント概要が設定されていること', function () {
+      $httpBackend.flush();
+      jasmine.getFixtures().set(scope.detail);
+      expect($('p:eq(1)')).toContainText('イベント概要');
+    });
+
+    it('イベント詳細が設定されていること', function () {
+      $httpBackend.flush();
+      jasmine.getFixtures().set(scope.detail);
+      expect($('p:eq(2)')).toContainText('イベント詳細');
+    });
+  });
 
 });
