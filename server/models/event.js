@@ -12,7 +12,7 @@ module.exports = function (sequelize, DataTypes) {
     title: DataTypes.STRING,
     /** 開始日時 */
     startDate: DataTypes.STRING,
-    /** 終了日次 */
+    /** 終了日時 */
     endDate: DataTypes.STRING,
     /** イベント管理者へのID */
     mgrId: DataTypes.INTEGER,
@@ -29,9 +29,9 @@ module.exports = function (sequelize, DataTypes) {
     /** イベント情報作成者 */
     createdBy: DataTypes.INTEGER,
     /** イベント情報作成日時 */
-    createDate: DataTypes.DATE,
+    createDate: DataTypes.STRING,
     /** イベント情報更新日時 */
-    updateDate: DataTypes.DATE
+    updateDate: DataTypes.STRING
   });
 
   return Event;

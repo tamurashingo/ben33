@@ -57,6 +57,10 @@ module.exports = {
     db.sequelize = sequelize;
     db.Sequelize = Sequelize;
 
+    sequelize.sync(function (err) {
+      console.log('DATABASE SYNC', err);
+    });
+
     return db;
   },
 

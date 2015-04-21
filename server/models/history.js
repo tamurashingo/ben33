@@ -13,7 +13,7 @@ module.exports = function (sequelize, DataTypes) {
     /** 内容 */
     description: DataTypes.TEXT,
     /** 作成日時 */
-    createDate: DataTypes.DATE
+    createDate: DataTypes.STRING
   });
 
   return History;
