@@ -32,7 +32,6 @@
  */
 
 var Event = require('./event.model');
-var models = require('../../models').models();
 var Promise = require('bluebird');
 var _ = require('lodash');
 require('date-utils');
@@ -76,38 +75,12 @@ function getEventModelAll(pageNo) {
 
 
 
-function getDetail(eventId) {
-  var Event = models.Event,
-      Mgr = models.Mgr,
-      ret = {};
-  
-  return Event.find({where: {eventId: eventId}})
-    .then(function (event) {
-      console.log(event.dataValues);
-      ret = event.dataValues;
-      return Mgr.find({where: {mgrId: event.dataValues.mgrId}});
-    })
-    .then(function (mgr) {
-      console.log(mgr.dataValues);
-      ret.userName = mgr.dataValues.userName;
-      return new Promise(function (resolve) {
-        resolve(ret);
-      });
-    })
-  ;
-}
-
-
 
 exports.getEventIndex = function (requestParams) {
   var pageNo = parseInt(requestParams.pageNo, 10);
   return getEventModelAll(pageNo);
 };
 
-exports.getEventDetail = function (requestParams) {
-  var eventId = requestParams.eventId;
-  return getDetail(eventId);
-};
 
 exports.preview = function (txt) {
   return converter.makeHtml(txt);
@@ -123,21 +96,6 @@ function convertRows(rows) {
   return array;
 }
 
-function registEvent (data, t) {
-  return models.Event.create(data.event,
-                             {transaction: t});
-}
-
-
-function registUser (data, t) {
-  return models.User.create(data.user,
-                            {transaction: t});
-}
-
-function registMgr (data, t) {
-  return models.Mgr.create(data.mgr,
-                           {transaction: t});
-};
 
 
 exports.regist = function (data) {
@@ -162,7 +120,6 @@ exports.regist = function (data) {
  */
 exports.convertRegistParam = function (req) {
   var now = (new Date()).toFormat('YYYY/MM/DD HH24:MI:SS');
-  console.log(req);
   return {
     eventName: req.createParam.eventName,
     startDate: req.createParam.startDate,
