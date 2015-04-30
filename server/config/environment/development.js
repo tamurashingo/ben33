@@ -3,11 +3,7 @@
 // Development specific configuration
 // ==================================
 module.exports = {
-  db: {
-    "username": "",
-    "password": "",
-    "database": "ben33_dev",
-    "dialect": "sqlite",
-    "storage": "data/db.development.sqlite"
+  mongo: {
+    uri: 'mongodb://localhost/ben33-dev'
   }
 };

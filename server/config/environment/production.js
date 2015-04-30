@@ -14,11 +14,11 @@ module.exports = {
             8080,
 
   // MongoDB connection options
-  db: {
-    "username": "",
-    "password": "",
-    "database": "ben33_prod",
-    "dialect": "sqlite",
-    "storage": "data/db.production.sqlite"
+  mongo: {
+    uri:    process.env.MONGOLAB_URI ||
+            process.env.MONGOHQ_URL ||
+            process.env.OPENSHIFT_MONGODB_DB_URL+process.env.OPENSHIFT_APP_NAME ||
+            'mongodb://localhost/ben33'
+
   }
 };
