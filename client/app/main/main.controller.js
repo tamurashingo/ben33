@@ -28,6 +28,10 @@ angular.module('ben33App')
           $scope.allEvents = data.result;
           $scope.prevButton = data.prev;
           $scope.nextButton = data.next;
+          console.log(data.result);
+          console.log(data.prev);
+          console.log(data.next);
+          console.log(data);
         })
         .catch(function () {
           growl.addErrorMessage('<i class="fa fa-exclamation-triangle"></i> サーバエラー', {ttl: 5000});
