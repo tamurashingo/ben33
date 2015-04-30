@@ -1,7 +1,11 @@
 language: node_js
 node_js:
-  - '0.10'
-  - '0.11'
+- '0.10'
+- '0.11'
 before_script:
-  - npm install -g bower grunt-cli
-  - bower install
+- npm install -g bower grunt-cli
+- bower install
+services: mongodb
+notifications:
+  slack:
+    secure: vestM6GoNnp19PH4Hxr+TWCabVpk++A14X5KcCbJtK30xGu9YtwOjrVRpFuzfI9bH1WGyQiWVVaGTZgj6CyGAOU0CBUfvn+nXCTiHKCA9unhsZ9cy/HOw2WwEm+hXHeZZsHsqpLIbdlg0lT5FcsmfsbA8zavog6QESWfSdhuZuY=

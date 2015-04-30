@@ -31,9 +31,7 @@
  *
  */
 
-var Showdown = require('showdown');
-var converter = new Showdown.converter();
-var models = require('../../models').models();
+var Event = require('./event.model');
 var Promise = require('bluebird');
 var _ = require('lodash');
 require('date-utils');
@@ -48,57 +46,33 @@ require('date-utils');
  *
  */
 function getEventModelAll(pageNo) {
-  var Event = models.Event;
-  return Event.findAndCountAll({
-    offset: pageNo,
-    limit: 10,
-    order: 'eventId desc'
-  })
-    .then(function (result) {
-      console.log("pageno :" + pageNo);
-      console.log("length :" + result.rows.length);
-      console.log("total  :" + result.count);
-      console.log("current:" + (pageNo + result.rows.length));
-    if (pageNo + result.rows.length < result.count) {
-      return {
-        prev: pageNo == 0 ? false : true,
-        next: true,
-        result: convertRows(result.rows),
-        total: Math.floor(result.count / 10) + 1
-      };
-    }
-    else {
-      return {
-        prev: pageNo == 0 ? false : true,
-        next: false,
-        result: convertRows(result.rows),
-        total: Math.floor(result.count / 10) + 1
-      };
-    }
+
+  return new Promise(function (resolve, reject) {
+    Event.find()
+      .limit(10)
+      .skip(pageNo * 10)
+      .sort({
+        createDate: 'desc'
+      })
+      .exec(function (err, events) {
+        if (err) {
+          reject(err);
+        }
+        Event.count().exec(function (err, count) {
+          if (err) {
+            reject(err);
+          }
+          resolve({
+            prev: pageNo == 0 ? false : true,
+            next: (pageNo * 10) + events.length < count ? true : false,
+            result: events,
+            total: Math.floor(count / 10) + 1
+          });
+        });
+      });
   });
 };
 
-
-function getDetail(eventId) {
-  var Event = models.Event,
-      Mgr = models.Mgr,
-      ret = {};
-  
-  return Event.find({where: {eventId: eventId}})
-    .then(function (event) {
-      console.log(event.dataValues);
-      ret = event.dataValues;
-      return Mgr.find({where: {mgrId: event.dataValues.mgrId}});
-    })
-    .then(function (mgr) {
-      console.log(mgr.dataValues);
-      ret.userName = mgr.dataValues.userName;
-      return new Promise(function (resolve) {
-        resolve(ret);
-      });
-    })
-  ;
-}
 
 
 
@@ -107,10 +81,6 @@ exports.getEventIndex = function (requestParams) {
   return getEventModelAll(pageNo);
 };
 
-exports.getEventDetail = function (requestParams) {
-  var eventId = requestParams.eventId;
-  return getDetail(eventId);
-};
 
 exports.preview = function (txt) {
   return converter.makeHtml(txt);
@@ -126,38 +96,46 @@ function convertRows(rows) {
   return array;
 }
 
-function registEvent (data, t) {
-  return models.Event.create(data.event,
-                             {transaction: t});
-}
-
-
-function registUser (data, t) {
-  return models.User.create(data.user,
-                            {transaction: t});
-}
-
-function registMgr (data, t) {
-  return models.Mgr.create(data.mgr,
-                           {transaction: t});
-};
 
 
 exports.regist = function (data) {
-  var sequelize = models.sequelize,
-      event = null;
-
-  return registEvent(data)
-    .then(function (result) {
-      event = result;
-      data.mgr.eventId = result.eventId;
-      return registMgr(data);
-    })
-    .then(function (result) {
-      return event.updateAttributes({
-        mgrId: result.mgrId
-      });
+  return new Promise(function (resolve, reject) {
+    Event.create(data, function (err, event) {
+      if (err) {
+        reject(err);
+      }
+      else {
+        resolve();
+      }
     });
+  });
 };
+
+
+/**
+ * リクエストパラメータをイベント登録用オブジェクトに変換する。
+ *
+ * @param {Object} req リクエストパラメータ
+ " @return {Object} イベント登録用オブジェクト
+ */
+exports.convertRegistParam = function (req) {
+  var now = (new Date()).toFormat('YYYY/MM/DD HH24:MI:SS');
+  return {
+    eventName: req.createParam.eventName,
+    startDate: req.createParam.startDate,
+    endDate: req.createParam.endDate,
+    mgrName: req.createParam.mgrName,
+    venue: req.createParam.venue,
+    abstraction: req.createParam.abstraction,
+    comment: req.createParam.desc,
+    createdBy: {
+//      id: req.user.id,
+//      userName: req.user.name
+    },
+    createDate: now,
+    updateDate: now
+  };
+};
+
 
 
