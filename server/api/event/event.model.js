@@ -25,35 +25,57 @@
  *
  */
 
+var mongoose = require('mongoose'),
+    Schema = mongoose.Schema;
 
 /**
- * Main application file
+ * イベント情報
  */
+var EventSchema = new Schema({
+  /** イベント名 */
+  eventName: String,
+  /** 開始日時 */
+  startDate: String,
+  /** 終了日時 */
+  endDate: String,
 
-// Set default node environment to development
-process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+  /** イベント管理者情報 */
+  mgrName: String,
+  
+  /** 開催場所 */
+  venue: String,
 
-var express = require('express');
-var mongoose = require('mongoose');
-var config = require('./config/environment');
+  /** イベント参加者情報 */
+  attendees: [{
+    id: Schema.ObjectId,
+    userName: String,
+    comment: String,
+    attendeeDate: Date
+  }],
+  /** イベント参加者キャンセル情報 */
+  cancels: [{
+    id: Schema.ObjectId,
+    userName: String,
+    comment: String,
+    cancelDate: Date
+  }],
 
-// Connect to database
-mongoose.connect(config.mongo.uri, config.mongo.options);
+  /** イベント概要 */
+  abstraction: String,
+  /** イベント詳細 */
+  comment: String,
 
-// Setup server
-var app = express();
-var server = require('http').createServer(app);
-require('./config/express')(app);
-require('./routes')(app);
+  /** イベント作成者情報 */
+  createdBy: {
+    id: Schema.ObjectId,
+    userName: String
+  },
 
-// Start server
-server.listen(config.port, config.ip, function () {
-  console.log('Express server listening on %d, in %s mode', config.port, app.get('env'));
+  /** イベント情報作成日時 */
+  createDate: Date,
+  /** イベント情報更新日時 */
+  updateDate: Date
 });
 
-
-// Expose app
-exports = module.exports = app;
-
-
+module.exports = mongoose.model('Event', EventSchema);
 

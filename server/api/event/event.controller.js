@@ -25,7 +25,7 @@
  *
  */
 
-var models = require('../../models');
+var Event = require('./event.model');
 var logic = require('./event.logic');
 
 
@@ -35,6 +35,22 @@ exports.index = function (req, res) {
       res.json(result);
     });
 };
+
+exports.show = function (req, res) {
+  console.log(req.params.id);
+  Event.findById(req.params.id, function (err, event) {
+    if (err) {
+      console.log(err);
+      return handleError(res, err);
+    }
+    if (!event) {
+      console.log('not found');
+      return res.send(404);
+    }
+    return res.json(event);
+  });
+};
+
 
 exports.description = function (req, res) {
   // req.eventId
@@ -47,14 +63,14 @@ exports.description = function (req, res) {
 
 
 exports.regist = function (req, res) {
-  var param = createRegistParam(req.body);
-
+  var param = logic.convertRegistParam(req.body);
   logic.regist(param)
     .then(function (result) {
       res.json({result: true,
-                message: 'イベント『' + param.event.title + '』を登録しました'});
+                message: 'イベント『' + param.eventName + '』を登録しました'});
     })
     .catch(function (e) {
+      console.log("error!");
       console.log(e);
       res.json({result: false,
                 message: 'イベント登録に失敗しました'});
@@ -103,4 +119,9 @@ function createRegistParam(req) {
 
   return requestParams;
 }
+
+function handleError(res, err) {
+  return res.send(500, err);
+}
+
 

@@ -38,11 +38,11 @@ angular.module('ben33App')
     function createMarkdown(event) {
       var str = '';
 
-      str = 'event id:' + event.eventId;
+      str = 'event id:' + event._id;
       str = str + '  \n';
       
       // イベント名
-      str = str + '# ' + event.title;
+      str = str + '# ' + event.eventName;
 
       // イベント概要
       if (event.abstraction) {

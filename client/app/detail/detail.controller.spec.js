@@ -20,8 +20,8 @@ describe('Controller: DetailCtrl', function () {
       $httpBackend = _$httpBackend_;
       $httpBackend.expectGET('/api/event/desc/1')
         .respond({
-          eventId: 1,
-          title: 'イベント名',
+          _id: 1,
+          eventName: 'イベント名',
           startDate: '12:00',
           endDate: '13:00',
           mgrId: 11,
