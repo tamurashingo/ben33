@@ -27,7 +27,7 @@ angular.module('ben33App', [
                .otherwise('/');
              $.material.init();
              $locationProvider.html5Mode(true);
-             $httpProvider.interceptros.push('authInterceptor');
+             $httpProvider.interceptors.push('authInterceptor');
              
              markedProvider.setOptions({
                gfm: true,
