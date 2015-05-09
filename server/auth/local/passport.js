@@ -1,6 +1,5 @@
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
-var LdapStrategy = require('passport-ldapauth').Strategy;
 
 exports.setup = function (User, config) {
   passport.use(new LocalStrategy({
