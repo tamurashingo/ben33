@@ -37,7 +37,6 @@ exports.index = function (req, res) {
 };
 
 exports.show = function (req, res) {
-  console.log(req.params.id);
   Event.findById(req.params.id, function (err, event) {
     if (err) {
       console.log(err);

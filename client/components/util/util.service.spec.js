@@ -5,7 +5,7 @@ describe('Utilサービス', function () {
   var Util;
 
   beforeEach(inject(function () {
-    var $injector = angular.injector(['ben33App']);
+    var $injector = angular.injector(['ben33App', 'ngMock']);
     Util = $injector.get('Util');
   }));
 
