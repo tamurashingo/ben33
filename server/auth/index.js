@@ -10,6 +10,12 @@ require('./local/passport').setup(User, config);
 
 var router = express.Router();
 
-router.use('/local', require('./local'));
+router.use('/', require('./local'));
 
+
+// 認証OKが出なかった場合はここで認証NGとする
+router.get('/*', function (req, res) {
+  return res.json(401, {message: 'ユーザ名またはパスワードが違います'});
+});
+  
 module.exports = router;

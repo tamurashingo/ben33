@@ -1,23 +1,37 @@
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
+var LdapStrategy = require('passport-ldapauth').Strategy;
 
 exports.setup = function (User, config) {
   passport.use(new LocalStrategy({
-      usernameField: 'email',
+      usernameField: 'userid',
       passwordField: 'password' // this is the virtual field on the model
     },
-    function(email, password, done) {
+    function(userid, password, done) {
+      console.log('first strategy');
       User.findOne({
-        email: email.toLowerCase()
+        userId: userid
       }, function(err, user) {
-        if (err) return done(err);
+        
+        // エラー発生
+        // → エラーを返す
+        if (err) {
+          return done(err);
+        }
 
+        // ユーザ未登録
+        // → 次の認証方式を試す
         if (!user) {
-          return done(null, false, { message: 'This email is not registered.' });
+          return done(null, user);
         }
+
+        // ユーザ登録済みだがパスワードが不正
+        // → エラーを返す
         if (!user.authenticate(password)) {
-          return done(null, false, { message: 'This password is not correct.' });
+          return done(null, false, { message: 'ユーザIDもしくはパスワードが違います' });
         }
+
+        // 正常の場合はuser情報を返す
         return done(null, user);
       });
     }

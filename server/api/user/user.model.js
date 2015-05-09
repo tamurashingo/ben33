@@ -3,22 +3,29 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var crypto = require('crypto');
-var authTypes = ['github', 'twitter', 'facebook', 'google'];
+var authTypes = ['ldap'];
 
 var UserSchema = new Schema({
+  /**
+   * ログインに使用するID
+   */
+  userId: String,
+  /**
+   * 画面に表示する名前
+   * LDAP等の場合はそこから取得する。
+   * データベースの場合はあとからユーザ自身で変えられるようにする？
+   */
   name: String,
-  email: { type: String, lowercase: true },
-  role: {
-    type: String,
-    default: 'user'
-  },
+  /**
+   * メールアドレス
+   * LDAP等の場合はそこから取得する。
+   * データベースの場合はあとからユーザ自身で変えられるようにする
+   */
+  email: String,
   hashedPassword: String,
+  /** 認証方式 */
   provider: String,
-  salt: String,
-  facebook: {},
-  twitter: {},
-  google: {},
-  github: {}
+  salt: String
 });
 
 /**
@@ -40,8 +47,7 @@ UserSchema
   .virtual('profile')
   .get(function() {
     return {
-      'name': this.name,
-      'role': this.role
+      'name': this.name
     };
   });
 
@@ -50,8 +56,7 @@ UserSchema
   .virtual('token')
   .get(function() {
     return {
-      '_id': this._id,
-      'role': this.role
+      '_id': this._id
     };
   });
 
@@ -59,13 +64,13 @@ UserSchema
  * Validations
  */
 
-// Validate empty email
+// Validate empty userId
 UserSchema
-  .path('email')
-  .validate(function(email) {
+  .path('userId')
+  .validate(function(userId) {
     if (authTypes.indexOf(this.provider) !== -1) return true;
-    return email.length;
-  }, 'Email cannot be blank');
+    return userId.length;
+  }, 'userIdを入力してください');
 
 // Validate empty password
 UserSchema
@@ -73,14 +78,14 @@ UserSchema
   .validate(function(hashedPassword) {
     if (authTypes.indexOf(this.provider) !== -1) return true;
     return hashedPassword.length;
-  }, 'Password cannot be blank');
+  }, 'パスワードを入力してください');
 
-// Validate email is not taken
+// Validate userId is not taken
 UserSchema
-  .path('email')
+  .path('userId')
   .validate(function(value, respond) {
     var self = this;
-    this.constructor.findOne({email: value}, function(err, user) {
+    this.constructor.findOne({userId: value}, function(err, user) {
       if(err) throw err;
       if(user) {
         if(self.id === user.id) return respond(true);
@@ -88,7 +93,7 @@ UserSchema
       }
       respond(true);
     });
-}, 'The specified email address is already in use.');
+}, 'そのuserIdはすでに使用されています');
 
 var validatePresenceOf = function(value) {
   return value && value.length;
