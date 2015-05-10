@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('ben33App')
-  .factory('Auth', ['$location', '$rootScope', '$http', 'User', '$cookieStore', '$q', function ($location, $rootScope, $http, User, $cookieStore, $q) {
+  .factory('Auth', ['$rootScope', '$http', 'User', '$cookieStore', '$q', function ($rootScope, $http, User, $cookieStore, $q) {
     var currentUser = {};
     if ($cookieStore.get('token')) {
       currentUser = User.get();
