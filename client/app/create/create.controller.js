@@ -1,10 +1,16 @@
 'use strict';
 
 angular.module('ben33App')
-  .controller('CreateCtrl', ['$scope', 'createService', 'growl', function ($scope, createService, growl) {
+  .controller('CreateCtrl', ['$scope', 'createService', 'Auth', 'growl', function ($scope, createService, Auth, growl) {
     
     /** 作成ボタンの状態 */
     $scope.registButton = true;
+
+    /** オーナー情報 */
+    $scope.owner = {
+      userid: Auth.getUserid(),
+      username: Auth.getUsername()
+    };
       
     function createParam(scope) {
       var param = {
@@ -12,7 +18,7 @@ angular.module('ben33App')
         startDate: scope.startDate,
         endDate: scope.endDate,
         venue: scope.venue,
-        mgr: scope.mgr,
+        mgrName: scope.owner.username,
         abstraction: scope.abstraction,
         desc: scope.desc
       };
@@ -33,7 +39,6 @@ angular.module('ben33App')
       'startDate',
       'endDate',
       'venue',
-      'mgr',
       'abstraction',
       'desc'],
       function(oldVal, newVal) {

@@ -6,22 +6,25 @@ angular.module('ben33App')
     $scope.show = false;
     $scope.clicked = false;
 
+    console.log('profile.edit.controller');
+
     /**
      * profileを取得する
+     *
      */
     (function () {
-      profileService.getOwnProfile()
-        .then(function (user) {
-          $scope.userid = user.userid;
-          $scope.username = user.username;
-          $scope.email = user.email;
-          $scope.provider = user.provider;
+       profileService.getOwnProfile()
+         .then(function (user) {
+           $scope.userid = user.userid;
+           $scope.username = user.username;
+           $scope.email = user.email;
+           $scope.provider = user.provider;
         
-          $scope.show = true;
-        })
-        .catch(function (err) {
-          growl.addErrorMessage(err, {ttl: 5000});
-        });
+           $scope.show = true;
+         })
+         .catch(function (err) {
+           growl.addErrorMessage(err, {ttl: 5000});
+         });
     })();
 
     /**

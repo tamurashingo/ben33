@@ -6,7 +6,13 @@ describe('Controller: MainCtrl', function () {
       stateParams;
 
   // load the controller's module
-  beforeEach(module('ben33App'));
+  beforeEach(function () {
+    module('ben33App');
+    module('ngMockE2E');
+    module(function ($urlRouterProvider) {
+      $urlRouterProvider.deferIntercept();
+    });
+  });
 
   beforeEach(inject(function ($controller, $rootScope) {
     scope = $rootScope.$new();

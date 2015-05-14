@@ -2,24 +2,99 @@
   <div growl></div>
 
   <div class="row">
-    <div class="col-md-12">
-      <h1 class="page-header">イベント詳細</h1>
-    </div>
-  </div><!-- row -->
-
-  <div class="row">
-    <div class="col-md-1">
-    </div>
-    <div class="col-md-10">
+    <h1 class="page-heder">イベント詳細</h1>
+    <div class="col-md-8">
       <div class="well">
         <div id="content" ng-bind-html="detail">
         </div>
         <hr />
-        <button>参加</button>
+        <button class="btn btn-raised btn-material-blue-900" ng-show="iseditable" ng-click="edit()">
+          イベント情報の修正
+        </button>
       </div>
-    </div>
-    <div class="col-md-1">
+    </div><!-- col-md-8 -->
+
+    
+    <div class="col-md-4">
+      <div class="panel panel-material-pink">
+        <div class="panel-body">
+          <span ng-show="!isentried">
+            <button class="btn btn-default" style="width:100%" ng-click="entry()">このイベントに申し込む</button>
+          </span>
+          <span ng-show="isentried">
+            <button class="btn btn-default" style="width:100%" ng-click="cancel()">このイベントをキャンセル</button>
+          </span>
+        </div>
+      </div>
+
+      <div class="panel panel-material-pink">
+        <div class="panel-heading">
+          参加者 ({{event.attends.length}}人)
+        </div>
+        <div class="panel-body">
+          <div class="thumb" ng-repeat="attend in event.attends">
+            <p class="name"><a ng-href="/profile/detail/{{attend.userid}}">{{$index + 1}}:{{attend.username}}</a></p>
+            <p class="comment">{{attend.comment}}</p>
+          </div><!-- ng-repeat -->
+        </div>
+      </div>
+
+      <div class="panel panel-material-pink">
+        <div class="panel-heading">
+          キャンセル者 ({{event.cancels.length}}人)
+        </div>
+        <div class="panel-body">
+          <div class="thumb" ng-repeat="cancel in event.cancels">
+            <p class="name"><a ng-href="/profile/detail/{{cancel.userid}}">{{$index + 1}}:{{cancel.username}}</a></p>
+            <p class="comment">{{cancel.comment}}</p>
+          </div><!-- ng-repeat -->
+        </div>
+      </div>
+      
     </div>
   </div>
-  
 </div>
+<script type="text/ng-template" id="entry.html">
+  <div class="modal-header">
+    <h3>イベント申し込み</h3>
+  </div>
+  <div class="modal-body">
+    <div class="form-group">
+      <label for="userName" class="col-lg-2 control-label">名前</label>
+      <div class="col-lg-10">
+        <input type="text" class="form-control" ng-model="$parent.userName" id="userName">
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="comment" class="col-lg-2 model=control-label">コメント</label>
+      <div class="col-lg-10">
+        <textarea class="form-control" rows="3" ng-model="$parent.comment" id="comment"></textarea>
+      </div>
+    </div>
+    <br />
+    <br />
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default" ng-click="dismiss()">やっぱりやめる</button>
+    <button type="button" class="btn btn-primary" ng-click="entry()">申し込み！</button>
+  </div>
+</script>
+<script type="text/ng-template" id="cancel.html">
+  <div class="modal-header">
+    <h3>イベントキャンセル</h3>
+  </div>
+  <div class="modal-body">
+    <div class="form-group">
+      <label for="comment" class="col-lg-2 model=control-label">コメント</label>
+      <div class="col-lg-10">
+        <textarea class="form-control" rows="3" ng-model="$parent.comment" id="comment"></textarea>
+      </div>
+    </div>
+    <br />
+    <br />
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default" ng-click="dismiss()">閉じる</button>
+    <button type="button" class="btn btn-primary" ng-click="cancel()">キャンセル</button>
+  </div>
+</script>

@@ -17,9 +17,6 @@ angular.module('ben33App')
           password: user.password
         })
         .success(function (data) {
-console.log("login");
-console.log(data.token);
-console.log(jwtHelper.decodeToken(data.token));
           store.set('jwt', data.token);
           deferred.resolve(data);
         })
@@ -89,6 +86,15 @@ console.log(jwtHelper.decodeToken(data.token));
        * Get User._id (pk)
        */
       getUserid: function () {
+        if (store.get('jwt')) {
+          return jwtHelper.decodeToken(store.get('jwt')).userid;
+        }
+        else {
+          return '';
+        }
+      },
+
+      getUsername: function () {
         if (store.get('jwt')) {
           return jwtHelper.decodeToken(store.get('jwt')).username;
         }

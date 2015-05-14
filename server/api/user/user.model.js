@@ -4,6 +4,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var crypto = require('crypto');
 var authTypes = ['local', 'facebook', 'google', 'twitter'];
+var Promise = require('bluebird');
 var AttendSchema = require('../event/attend.model');
 
 var UserSchema = new Schema({
@@ -19,7 +20,7 @@ var UserSchema = new Schema({
   /** 認証方式 */
   provider: String,
   /** イベント情報 */
-  events:[AttendSchema],
+  events:[{type: Schema.ObjectId, ref: 'Attend'}],
   salt: String
 });
 
@@ -159,3 +160,5 @@ UserSchema.methods = {
 };
 
 module.exports = mongoose.model('User', UserSchema);
+
+
