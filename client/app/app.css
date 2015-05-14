@@ -35,3 +35,16 @@ body {
           transition: 0.5s ease all;
 }
 
+
+.thumb {
+    border-bottom: 1px dashed #ccc;
+    padding-bottom: 4px;
+    margin-bottom: 6px;
+    min-height: 26px;
+}
+
+.comment {
+    color: #999;
+    margin-top: 0;
+    font-size: 10px;
+}

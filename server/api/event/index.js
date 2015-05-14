@@ -117,12 +117,14 @@ router.get('/desc/:id', controller.show);
  */
 router.post('/', controller.regist);
 
+
 /**
- * イベント情報更新
- *
- *
+ * イベント参加登録
+ * - リクエストパラメータ
+ *   - userName: ユーザ名
+ *   - comment: コメント
  */
-//router.put('/:eventId', controller.update);
+router.post('/entry', controller.entry);
 
 
 /**

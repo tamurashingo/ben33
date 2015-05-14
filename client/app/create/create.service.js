@@ -85,10 +85,10 @@ angular.module('ben33App')
           + desc.venue;
       }
       // イベント管理者
-      if (desc.mgr) {
+      if (desc.mgrName) {
         str = str + '\n'
           + '#### <i class="fa fa-user"></i> '
-          + desc.mgr;
+          + desc.mgrName;
       }
       
       

@@ -87,6 +87,26 @@ exports.preview = function (req, res) {
   res.json({html: markUp});
 };
 
+exports.entry = function (req, res) {
+  console.log('id');
+  console.log(req.body.id);
+  Event.findByIdAndUpdate(req.body.id,
+    {
+      $push: {
+        attendees: {
+          userName: req.body.userName,
+          comment: req.body.comment
+        }}},
+    function (result, error) {
+      console.log('result');
+      console.log(result);
+      console.log('error');
+      console.log(error);
+      res.json({result: true,
+                message: '参加を受け付けました。<br />ページをリロードしてください。'});
+    });
+};
+
 
 /**
  * リクエストパラメータからイベント登録に必要なデータを生成する。

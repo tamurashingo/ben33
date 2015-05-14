@@ -75,7 +75,6 @@ function getEventModelAll(pageNo) {
 
 
 
-
 exports.getEventIndex = function (requestParams) {
   var pageNo = parseInt(requestParams.pageNo, 10);
   return getEventModelAll(pageNo);

@@ -12,7 +12,7 @@ angular.module('ben33App')
         startDate: scope.startDate,
         endDate: scope.endDate,
         venue: scope.venue,
-        mgr: scope.mgr,
+        mgrName: scope.mgr,
         abstraction: scope.abstraction,
         desc: scope.desc
       };

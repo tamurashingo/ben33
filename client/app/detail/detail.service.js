@@ -1,7 +1,37 @@
 'use strict';
 
 angular.module('ben33App')
-  .factory('detailService', ['$q', '$http', '$sce', 'Util', function ($q, $http, $sce, Util) {
+  .factory('detailService', ['$rootScope', '$q', '$http', '$sce', '$modal', 'growl', 'Util', function ($rootScope, $q, $http, $sce, $modal, growl, Util) {
+
+    function entryEvent(eventId, userName, comment) {
+      var res = $q.defer();
+      console.log(eventId);
+      console.log(userName);
+      console.log(comment);
+      $http.post('/api/event/entry', {
+        id: eventId,
+        userName: userName,
+        comment: comment
+      })
+        .success(function (data, status, headers, config) {
+          if (angular.isDefined(data.result) && data.result) {
+            res.resolve(data.message);
+          }
+          else if (angular.isUndefined(data.result)) {
+            res.reject('サーバエラーです。<br />管理者に連絡してください。');
+          }
+          else if (data.result == false) {
+            res.reject(data.message);
+          }
+          // not reached
+          res.reject('FATAL ERROR!!');
+        })
+        .error(function (data, status, headers, config) {
+          res.reject('サーバエラーです。<br />管理者に連絡してください。');
+        });
+
+      return res.promise;
+    }
 
     function detail(eventId) {
       var url = '/api/event/desc/' + eventId,
@@ -24,7 +54,8 @@ angular.module('ben33App')
       detail(eventId)
         .then(function (event) {
           var html = Util.md2html(createMarkdown(event));
-          res.resolve(html);
+          res.resolve({html: html,
+                       event: event});
         });
 
       return res.promise;
@@ -95,8 +126,37 @@ angular.module('ben33App')
       return str;
     }
 
+
+    function openEntryModal(id) {
+      var scope = $rootScope.$new(),
+          modal;
+
+      scope.userName = "";
+      scope.comment = "";
+      
+      scope.entry = function () {
+        modal.close();
+        entryEvent(id, scope.userName, scope.comment)
+          .then(function (message) {
+            growl.addSuccessMessage(message, {ttl: 5000});
+          },
+          function (message) {
+            growl.addErrorMessage(message, {ttl: -1});
+          });
+      };
+      scope.dismiss = function () {
+        modal.close();
+      };
+      modal = $modal.open({
+        templateUrl: 'entry.html',
+        backdrop: 'static',
+        scope: scope
+      });
+    }
+
     return {
-      view: view
+      view: view,
+      entry: openEntryModal
     };
     
   }])

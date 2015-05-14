@@ -47,14 +47,14 @@ var EventSchema = new Schema({
 
   /** イベント参加者情報 */
   attendees: [{
-    id: Schema.ObjectId,
+//    id: Schema.ObjectId,
     userName: String,
     comment: String,
     attendeeDate: Date
   }],
   /** イベント参加者キャンセル情報 */
   cancels: [{
-    id: Schema.ObjectId,
+//    id: Schema.ObjectId,
     userName: String,
     comment: String,
     cancelDate: Date

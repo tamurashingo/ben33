@@ -6,12 +6,17 @@ angular.module('ben33App')
 
     detailService.view(eventId)
       .then(function (data) {
-        $scope.detail = data;
+        $scope.detail = data.html;
+        $scope.event = data.event;
       })
       .catch(function () {
           $scope.detail = {};
           growl.addErrorMessage('<i class="fa fa-exclamation-triangle"></i> サーバエラー', {ttl: -1});
       });
+
+    $scope.entry = function () {
+      detailService.entry(eventId);
+    };
     
   }]);
 
