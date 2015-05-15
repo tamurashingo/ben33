@@ -128,6 +128,22 @@ router.post('/entry', controller.entry);
 
 
 /**
+ * イベントキャンセル
+ * 同名のユーザがいた場合は一緒にキャンセルされます
+ * - リクエストパラメータ
+ *   - userName: ユーザ名
+ *   - comment: コメント
+ */
+router.post('/cancel', controller.cancel);
+
+/**
+ * イベント情報修正
+ *
+ */
+router.put('/edit', controller.edit);
+
+
+/**
  * プレビュー
  *
  */

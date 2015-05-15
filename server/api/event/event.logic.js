@@ -74,6 +74,8 @@ function getEventModelAll(pageNo) {
 };
 
 
+exports.entry = function () {
+};
 
 exports.getEventIndex = function (requestParams) {
   var pageNo = parseInt(requestParams.pageNo, 10);
@@ -110,12 +112,88 @@ exports.regist = function (data) {
   });
 };
 
+exports.edit = function (id, data) {
+  return new Promise(function (resolve, reject) {
+    Event.findByIdAndUpdate(id,
+      {
+        $set: data
+      },
+      function (error, result) {
+        if (error) {
+          // 更新失敗！
+          reject(error);
+        }
+        else {
+          // 更新成功！
+          resolve();
+        }
+      });
+  });
+};
+
+exports.entry = function (id, attndee) {
+  return new Promise(function (resolve, reject) {
+    Event.findByIdAndUpdate(id,
+      {
+        $push: {attendees: attndee}
+      },
+      function (error, result) {
+        if (error) {
+          console.log(error);
+          // 参加登録失敗！
+          reject(error);
+        }
+        else {
+          // 参加登録成功！
+          resolve();
+        }
+      });
+    });
+};
+
+exports.cancel = function (id, cancel) {
+  return new Promise(function (resolve, reject) {
+    Event.findById(id,
+      function (error, event) {
+        var index = -1,
+            attendees = event.attendees;
+
+        if (error) {
+          reject(error);
+        }
+
+        _.each(attendees, function (elm, idx) {
+          if (elm.userName === cancel.userName) {
+            index = idx;
+          }
+        });
+
+        if (index != -1) {
+          attendees.splice(index, 1);
+          Event.findByIdAndUpdate(id,
+            {
+              $set : {attendees: attendees},
+              $push: {cancels: cancel}
+            },
+            function (error, result) {
+              if (error) {
+                  console.log(error);
+              }
+              resolve();
+            });
+        }
+        else {
+          reject("キャンセルデータがありませんでした");
+        }
+      });
+  });
+};
 
 /**
  * リクエストパラメータをイベント登録用オブジェクトに変換する。
  *
  * @param {Object} req リクエストパラメータ
- " @return {Object} イベント登録用オブジェクト
+ * @return {Object} イベント登録用オブジェクト
  */
 exports.convertRegistParam = function (req) {
   var now = (new Date()).toFormat('YYYY/MM/DD HH24:MI:SS');
@@ -135,6 +213,42 @@ exports.convertRegistParam = function (req) {
     updateDate: now
   };
 };
+
+/**
+ * リクエストパラメータをイベント更新用オブジェクトに変換する。
+ *
+ * @param {Object} req リクエストパラメータ
+ * @return {Object} イベント更新用オブジェクト
+ */
+exports.convertEditParam = function (req) {
+  var now = (new Date()).toFormat('YYYY/MM/DD HH24:MI:SS');
+  return {
+    eventName: req.editParam.eventName,
+    startDate: req.editParam.startDate,
+    endDate: req.editParam.endDate,
+    mgrName: req.editParam.mgrName,
+    venue: req.editParam.venue,
+    abstraction: req.editParam.abstraction,
+    comment: req.editParam.desc,
+    updateDate: now
+  };
+};
+
+
+/**
+ * リクエストパラメータをイベント参加登録用オブジェクトに変換する。
+ *
+ * @param {Object} req リクエストパラメータ
+ " @return {Object} イベント参加登録用オブジェクト
+ */
+exports.convertEntryParam = function (req) {
+  var now = (new Date()).toFormat('YYYY/MM/DD HH24:MI:SS');
+  return {
+    userName: req.userName,
+    comment: req.comment
+  };
+};
+
 
 
 

@@ -8,6 +8,9 @@
         <div id="content" ng-bind-html="detail">
         </div>
         <hr />
+        <button class="btn btn-raised btn-material-blue-900" ng-click="edit()">
+          イベント情報の修正
+        </button>
       </div>
     </div><!-- col-md-8 -->
 
@@ -15,7 +18,7 @@
     <div class="col-md-4">
       <div class="panel panel-material-pink">
         <div class="panel-body">
-          <button ng-click="entry()">このイベントに申し込む</button>
+          <button class="btn btn-default btn-flat" style="width:100%" ng-click="entry()">このイベントに申し込む</button>
         </div>
       </div>
 
@@ -25,11 +28,24 @@
         </div>
         <div class="panel-body">
           <div class="thumb" ng-repeat="attendee in event.attendees">
-            <p class="name">{{attendee.userName}}</p>
+            <p class="name"><a ng-click="cancel(attendee.userName)" href="">{{$index + 1}}:{{attendee.userName}}</a></p>
             <p class="comment">{{attendee.comment}}</p>
           </div><!-- ng-repeat -->
         </div>
       </div>
+
+      <div class="panel panel-material-pink">
+        <div class="panel-heading">
+          キャンセル者 ({{event.cancels.length}}人)
+        </div>
+        <div class="panel-body">
+          <div class="thumb" ng-repeat="cancel in event.cancels">
+            <p class="name">{{$index + 1}}:{{cancel.userName}}</a></p>
+            <p class="comment">{{cancel.comment}}</p>
+          </div><!-- ng-repeat -->
+        </div>
+      </div>
+      
     </div>
   </div>
 </div>
@@ -54,7 +70,26 @@
     <br />
   </div>
   <div class="modal-footer">
-    <button type="button" class="btn btn-default" ng-click="entry()">申し込み！</button>
-    <button type="button" class="btn btn-primary" ng-click="dismiss()">やっぱりやめる</button>
+    <button type="button" class="btn btn-default" ng-click="dismiss()">やっぱりやめる</button>
+    <button type="button" class="btn btn-primary" ng-click="entry()">申し込み！</button>
+  </div>
+</script>
+<script type="text/ng-template" id="cancel.html">
+  <div class="modal-header">
+    <h3>イベントキャンセル</h3>
+  </div>
+  <div class="modal-body">
+    <div class="form-group">
+      <label for="comment" class="col-lg-2 model=control-label">コメント</label>
+      <div class="col-lg-10">
+        <textarea class="form-control" rows="3" ng-model="$parent.comment" id="comment"></textarea>
+      </div>
+    </div>
+    <br />
+    <br />
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default" ng-click="dismiss()">閉じる</button>
+    <button type="button" class="btn btn-primary" ng-click="cancel()">キャンセル</button>
   </div>
 </script>

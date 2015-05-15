@@ -27,7 +27,7 @@
 
 var Event = require('./event.model');
 var logic = require('./event.logic');
-
+var _ = require('lodash');
 
 exports.index = function (req, res) {
   logic.getEventIndex(req.params)
@@ -77,6 +77,22 @@ exports.regist = function (req, res) {
     });
 };
 
+exports.edit = function (req, res) {
+  var param = logic.convertEditParam(req.body),
+      eventId = req.body.eventId;
+  logic.edit(eventId, param)
+    .then(function (result) {
+      res.json({result: true,
+                message: 'イベント『' + param.eventName + '』を更新しました'});
+    })
+    .catch(function (e) {
+      console.log("error!");
+      console.log(e);
+      res.json({result: false,
+                message: 'イベント更新に失敗しました'});
+    });
+};
+
 
 exports.update = function (req, res) {
 };
@@ -88,57 +104,35 @@ exports.preview = function (req, res) {
 };
 
 exports.entry = function (req, res) {
-  console.log('id');
-  console.log(req.body.id);
-  Event.findByIdAndUpdate(req.body.id,
-    {
-      $push: {
-        attendees: {
-          userName: req.body.userName,
-          comment: req.body.comment
-        }}},
-    function (result, error) {
-      console.log('result');
-      console.log(result);
-      console.log('error');
-      console.log(error);
+  var eventId = req.body.id,
+      attendee = logic.convertEntryParam(req.body);
+
+  logic.entry(eventId, attendee)
+    .then(function (result) {
       res.json({result: true,
-                message: '参加を受け付けました。<br />ページをリロードしてください。'});
+                message: '参加を受け付けました'});
+    })
+    .catch(function (e) {
+      res.json({result:false,
+                message: '参加登録に失敗しました'});
     });
 };
 
+exports.cancel = function (req, res) {
+  var eventId = req.body.id,
+      cancel = logic.convertEntryParam(req.body);
 
-/**
- * リクエストパラメータからイベント登録に必要なデータを生成する。
- * @param {} req リクエストパラメータのbody(POSTされたパラメータ)
- *
- */
-function createRegistParam(req) {
-  var requestParams = {
-    event: {
-      eventId: null,
-      title: req.createParam.eventName,
-      startDate: req.createParam.startDate,
-      endDate: req.createParam.endDate,
-      mgrId: null,
-      venue: req.createParam.venue,
-      abstraction: req.createParam.abstraction,
-      comment: req.createParam.desc
-    },
-    user: {
-      username: req.createParam.mgr,
-      valid: true
-    },
-    mgr: {
-      eventId: null,
-      userId: null,
-      userName: req.createParam.mgr,
-      rollName: null
-    }
-  };
+  logic.cancel(eventId, cancel)
+    .then(function (result) {
+      res.json({result: true,
+                message: 'キャンセルしました'});
+    })
+    .catch(function (e) {
+      res.json({result:false,
+                message: 'キャンセルに失敗しました'});
+    });
+};
 
-  return requestParams;
-}
 
 function handleError(res, err) {
   return res.send(500, err);

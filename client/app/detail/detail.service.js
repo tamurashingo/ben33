@@ -5,9 +5,6 @@ angular.module('ben33App')
 
     function entryEvent(eventId, userName, comment) {
       var res = $q.defer();
-      console.log(eventId);
-      console.log(userName);
-      console.log(comment);
       $http.post('/api/event/entry', {
         id: eventId,
         userName: userName,
@@ -32,6 +29,36 @@ angular.module('ben33App')
 
       return res.promise;
     }
+
+    function cancelEvent(eventId, userName, comment) {
+      console.log(userName);
+      var res = $q.defer();
+      $http.post('/api/event/cancel', {
+        id: eventId,
+        userName: userName,
+        comment: comment
+      })
+        .success(function (data, status, headers, config) {
+          if (angular.isDefined(data.result) && data.result) {
+            res.resolve(data.message);
+          }
+          else if (angular.isUndefined(data.result)) {
+            res.reject('サーバエラーです。<br />管理者に連絡してください。');
+          }
+          else if (data.result == false) {
+            res.reject(data.message);
+          }
+          // not reached
+          res.reject('FATAL ERROR!!');
+        })
+        .error(function (data, status, headers, config) {
+          res.reject('サーバエラーです。<br />管理者に連絡してください。');
+        });
+
+      return res.promise;
+    }
+
+    
 
     function detail(eventId) {
       var url = '/api/event/desc/' + eventId,
@@ -107,10 +134,10 @@ angular.module('ben33App')
           + event.venue;
       }
       // イベント管理者
-      if (event.userName) {
+      if (event.mgrName) {
         str = str + '\n'
           + '#### <i class="fa fa-user"></i> '
-          + event.userName;
+          + event.mgrName;
       }
       
       
@@ -129,6 +156,7 @@ angular.module('ben33App')
 
     function openEntryModal(id) {
       var scope = $rootScope.$new(),
+          res = $q.defer(),
           modal;
 
       scope.userName = "";
@@ -138,10 +166,10 @@ angular.module('ben33App')
         modal.close();
         entryEvent(id, scope.userName, scope.comment)
           .then(function (message) {
-            growl.addSuccessMessage(message, {ttl: 5000});
+            res.resolve(message);
           },
           function (message) {
-            growl.addErrorMessage(message, {ttl: -1});
+            res.reject(message);
           });
       };
       scope.dismiss = function () {
@@ -149,14 +177,45 @@ angular.module('ben33App')
       };
       modal = $modal.open({
         templateUrl: 'entry.html',
-        backdrop: 'static',
         scope: scope
       });
+
+      return res.promise;
+    }
+
+
+    function openCancelModal(id, userName) {
+      var scope = $rootScope.$new(),
+          res = $q.defer(),
+          modal;
+
+      scope.comment = "";
+
+      scope.cancel = function () {
+        modal.close();
+        cancelEvent(id, userName, scope.comment)
+          .then(function (message) {
+            res.resolve(message);
+          },
+          function (message) {
+            res.reject(message);
+          });
+      };
+      scope.dismiss = function () {
+        modal.close();
+      };
+      modal = $modal.open({
+        templateUrl: 'cancel.html',
+        scope: scope
+      });
+
+      return res.promise;
     }
 
     return {
       view: view,
-      entry: openEntryModal
+      entry: openEntryModal,
+      cancel: openCancelModal
     };
     
   }])
