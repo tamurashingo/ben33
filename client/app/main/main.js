@@ -6,6 +6,9 @@ angular.module('ben33App')
       .state('main', {
         url: '/:pageNo',
         templateUrl: 'app/main/main.html',
-        controller: 'MainCtrl'
+        controller: 'MainCtrl',
+        data: {
+          requiresLogin: true
+        }
       });
   }]);

@@ -4,9 +4,12 @@
 
 'use strict';
 
+var auth = require('./auth/auth.service');
 var errors = require('./components/errors');
 
 module.exports = function(app) {
+
+  app.use('/api/event', auth.isAuthenticated);
 
   // Insert routes below
   app.use('/api/messages', require('./api/message'));

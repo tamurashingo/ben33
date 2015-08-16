@@ -3,6 +3,7 @@
 var express = require('express');
 var passport = require('passport');
 var auth = require('../auth.service');
+var jwt = require('jsonwebtoken');
 
 var router = express.Router();
 
@@ -10,18 +11,23 @@ router.post('/', function(req, res, next) {
   passport.authenticate('local', function (err, user, info) {
     var error = err || info;
 
-    // 認証エラー発生時は401を返す
+    // サーバエラー発生時は401を返す
     if (error) {
-      res.json(401, error);
+      return res.json(401, {
+          message: error.message ? error.message :
+              "サーバエラーが発生しました。再度やり直してください。 err=" + error});
     }
 
-    // ユーザ未登録の場合は次の認証方式を試す
+    // ユーザ未登録でここまで来たの場合は404を返す
+    // 通常はこの前段階で401を返しているため
     if (!user) {
-      next();
+      return res.json(404, {message: "サーバエラーが発生しました。再度やり直してください。"});
     }
+
+    console.log("user:" + user);
 
     // 認証OKの場合、トークンを返す
-    var token = auth.signToken(user._id, user.role);
+    var token = auth.signToken(user._id);
     res.json({token: token});
     
   })(req, res, next);

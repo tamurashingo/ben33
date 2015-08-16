@@ -1,12 +1,7 @@
 'use strict';
 
 angular.module('ben33App')
-  .factory('Auth', ['$rootScope', '$http', 'User', '$cookieStore', '$q', function ($rootScope, $http, User, $cookieStore, $q) {
-    var currentUser = {};
-    if ($cookieStore.get('token')) {
-      currentUser = User.get();
-    }
-
+  .factory('Auth', ['$http', '$q', 'store', 'jwtHelper', function ($http, $q, store, jwtHelper) {
     return {
 
       /**
@@ -17,24 +12,18 @@ angular.module('ben33App')
        * @return {Promise}
        */
       login: function (user, callback) {
-        var cb = callback || angular.noop;
         var deferred = $q.defer();
-
         $http.post('/auth', {
-          userId: user.userid,
+          userid: user.userid,
           password: user.password
         })
         .success(function (data) {
-          $cookieStore.put('token', data.token);
-          currentUser = User.get();
+          store.set('jwt', data.token);
           deferred.resolve(data);
-          return cb();
         })
         .error(function (err) {
-          this.logout();
           deferred.reject(err);
-          return cb(err);
-        }.bind(this));
+        });
 
         return deferred.promise;
       },
@@ -45,30 +34,7 @@ angular.module('ben33App')
        * @param {Function}
        */
       logout: function () {
-        $cookieStore.remove('token');
-        currentUser = {};
-      },
-
-      /**
-       * Create a new user
-       *
-       * @param {Object} user - user info
-       * @param {Function} callback - optional
-       * @return {Promise}
-       */
-      createUser: function (user, callback) {
-        var cb = callback || angular.noop;
-
-        return User.save(user,
-          function (data) {
-            $cookieStore.put('token', data.token);
-            currentUser = User.get();
-            return cb(user);
-          },
-          function (err) {
-            this.logout();
-            return cb(err);
-          }.bind(this)).$promise;
+        store.remove('jwt');
       },
 
       /**
@@ -77,7 +43,12 @@ angular.module('ben33App')
        * @return {Object} user
        */
       getCurrentUser: function () {
-        return currentUser;
+        if (store.get('jwt')) {
+          return jwtHelper.decodeToken(stoe.get('jwt')).username;
+        }
+        else {
+          return "no login";
+        }
       },
 
       /**
@@ -86,34 +57,14 @@ angular.module('ben33App')
        * @return {Boolean}
        */
       isLoggedIn: function () {
-        return currentUser.hasOwnProperty('role');
-      },
-
-      /**
-       * Waits for currentUser to resolve before checking if user is logged in
-       */
-      isLoggedInAsync: function (cb) {
-        if (currentUser.hasOwnProperty('$promise')) {
-          currentUser.$promise.then(function () {
-            cb(true);
-          })
-          .catch(function () {
-            cb(false);
-          });
-        }
-        else if (currentUser.hasOwnProperty('role')) {
-          cb(true);
-        }
-        else {
-          cb(false);
-        }
+        return store.get('jwt') && !jwtHelper.isTokenExpired(store.get('jwt'));
       },
 
       /**
        * Get auth token
        */
       getToken: function () {
-        return $cookieStore.get('token');
+        return store.get('jwt');
       }
     };
   }]);

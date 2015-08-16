@@ -33,8 +33,11 @@ angular.module('ben33App')
           console.log(data.next);
           console.log(data);
         })
-        .catch(function () {
-          growl.addErrorMessage('<i class="fa fa-exclamation-triangle"></i> サーバエラー', {ttl: 5000});
+        .catch(function (msg) {
+          if (!msg) {
+            msg = '<i class="fa fa-exclamation-triangle"></i> サーバエラー';
+          }
+          growl.addErrorMessage(msg, {ttl: 5000});
         });
     };
 

@@ -7,7 +7,6 @@ exports.setup = function (User, config) {
       passwordField: 'password' // this is the virtual field on the model
     },
     function(userid, password, done) {
-      console.log('first strategy');
       User.findOne({
         userId: userid
       }, function(err, user) {
@@ -18,10 +17,14 @@ exports.setup = function (User, config) {
           return done(err);
         }
 
+        if (userid === "tamura" && password === "password") {
+          return done(null, {userid: "tamura"});
+        }
+
         // ユーザ未登録
-        // → 次の認証方式を試す
+        // → エラーを返す
         if (!user) {
-          return done(null, user);
+          return done(null, false, { message: 'ユーザIDもしくはパスワードが違います' });
         }
 
         // ユーザ登録済みだがパスワードが不正
