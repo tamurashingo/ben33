@@ -24,10 +24,11 @@ router.post('/', function(req, res, next) {
       return res.json(404, {message: "サーバエラーが発生しました。再度やり直してください。"});
     }
 
-    console.log("user:" + user);
+    console.log("user");
+    console.log(user);
 
     // 認証OKの場合、トークンを返す
-    var token = auth.signToken(user._id);
+    var token = auth.signToken(user.username, user._id);
     res.json({token: token});
     
   })(req, res, next);

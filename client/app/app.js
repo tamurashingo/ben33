@@ -28,7 +28,7 @@ angular.module('ben33App', [
                      jwtInterceptorProvider) {
              
              $urlRouterProvider
-               .otherwise('/');
+               .otherwise('/main/');
              $.material.init();
              $locationProvider.html5Mode(true);
              
@@ -41,9 +41,9 @@ angular.module('ben33App', [
              growlProvider.globalEnableHtml(true);
 
              // JWT interceptor will take care of sending the JWT in every request
-             jwtInterceptorProvider.tokenGetter = function (store) {
+             jwtInterceptorProvider.tokenGetter = ['store', function (store) {
                return store.get('jwt');
-             };
+             }];
 
              $httpProvider.interceptors.push('jwtInterceptor');
 
@@ -54,15 +54,22 @@ angular.module('ben33App', [
         function ($rootScope,
                   $state,
                   Auth) {
+
           // Redirect to login if route requires auth and you're not logged in
-          $rootScope.$on('$stateChangeStart', function (event, next) {
-            if (next.data && next.data.requiresLogin) {
+          $rootScope.$on('$stateChangeStart', function (event, toState, toParams) {
+            console.log('next:' + toState.url);
+            console.log('param');
+            console.log(toParams);
+            if (toState.data && toState.data.requiresLogin) {
               if (!Auth.isLoggedIn()) {
+                $rootScope.returnToState = toState.url;
+                $rootScope.returnToStateParams = toParams;
                 event.preventDefault();
                 $state.go('login');
               }
             }
           });
+
         }]);
 
 

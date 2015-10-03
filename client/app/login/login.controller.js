@@ -1,16 +1,26 @@
 'use strict';
 
 angular.module('ben33App')
-  .controller('LoginCtrl', ['$scope', '$state', 'Auth', 'growl', function ($scope, $state, Auth, growl) {
-    $scope.user = {};
+  .controller('LoginCtrl', ['$scope', '$location', 'Auth', 'growl', function ($scope, $location, Auth, growl) {
 
     $scope.login = function () {
       Auth.login({
         userid: $scope.userid,
         password: $scope.password
       }).then(function () {
-        growl.addSuccessMessage("Logged in", {ttl: 5000});
-        $state.go('main');
+        growl.addWarnMessage("ログインしました", {ttl: 5000});
+
+//        サンプル
+//        if ($scope.returnToState === '/:pageNo') {
+//          $location.path('/' + $scope.returnToStateParams.pageNo);
+//        }
+        
+        if ($scope.returnToState === '/create') {
+          $location.path('/create');
+        }
+        else {
+          $location.path('/');
+        }
       })
       .catch(function (error) {
         console.log(error);

@@ -19,12 +19,18 @@ body {
     padding-top: 70px;
 }
 
+.btn {
+    text-transform: none;
+}
+
 
 .growl {
     position: fixed;
     z-index: 5000;
-    top: 150px;
-    right: 10px;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    opacity: 0.9;
 }
 
 .growl-item.ng-enter,
@@ -34,4 +40,10 @@ body {
        -o-transition: 0.5s ease all;
           transition: 0.5s ease all;
 }
+
+.growl .alert-warning {
+    color: rgba(0, 0, 0, .84);
+    background-color: #ebeb00;
+}
+
 

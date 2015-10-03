@@ -11,9 +11,14 @@ var User = require('../api/user/user.model');
 /**
  * Returns a jwt token signed by the app secret
  */
-function signToken(id) {
-  return jwt.sign({ _id: id }, config.secrets.session, { expiresInMinutes: 60*5 });
+function signToken(username, userid) {
+  return jwt.sign({
+    username: username,
+    userid: userid
+  }, config.secrets.session, { expiresInMinutes: 60*5 });
 }
 
 exports.isAuthenticated = expressJwt({ secret: config.secrets.session });
 exports.signToken = signToken;
+exports.decode = jwt.decode;
+

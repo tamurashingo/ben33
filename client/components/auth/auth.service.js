@@ -8,22 +8,40 @@ angular.module('ben33App')
        * Authenticate user and save token
        *
        * @param {Object} user - login info
-       * @param {Function} callback - optional
        * @return {Promise}
        */
-      login: function (user, callback) {
+      login: function (user) {
         var deferred = $q.defer();
         $http.post('/auth', {
           userid: user.userid,
           password: user.password
         })
         .success(function (data) {
+console.log("login");
+console.log(data.token);
+console.log(jwtHelper.decodeToken(data.token));
           store.set('jwt', data.token);
           deferred.resolve(data);
         })
         .error(function (err) {
           deferred.reject(err);
         });
+
+        return deferred.promise;
+      },
+
+      update: function () {
+        var deferred = $q.defer();
+        $http.post('/auth/refresh')
+          .success(function (data) {
+            store.set('jwt', data.token);
+            console.log(data.token);
+            console.log(jwtHelper.decodeToken(store.get('jwt')).username);
+            deferred.resolve(data);
+          })
+          .error(function (err) {
+            deferred.reject(err);
+          });
 
         return deferred.promise;
       },
@@ -44,7 +62,7 @@ angular.module('ben33App')
        */
       getCurrentUser: function () {
         if (store.get('jwt')) {
-          return jwtHelper.decodeToken(stoe.get('jwt')).username;
+          return jwtHelper.decodeToken(store.get('jwt')).username;
         }
         else {
           return "no login";
@@ -65,6 +83,18 @@ angular.module('ben33App')
        */
       getToken: function () {
         return store.get('jwt');
+      },
+
+      /**
+       * Get User._id (pk)
+       */
+      getUserid: function () {
+        if (store.get('jwt')) {
+          return jwtHelper.decodeToken(store.get('jwt')).username;
+        }
+        else {
+          return '';
+        }
       }
     };
   }]);

@@ -2,6 +2,8 @@
 
 angular.module('ben33App')
   .controller('MainCtrl', ['$scope', '$location', '$stateParams', 'mainService', 'growl', function ($scope, $location, $stateParams, mainService, growl) {
+    console.log('main.controller.js');
+    console.log($stateParams);
     $scope.allEvents = [];
 
     /** ページは1から始める */
@@ -15,7 +17,7 @@ angular.module('ben33App')
       var pageNo = parseInt($stateParams.pageNo, 10);
       // TODO: 将来的には Number.isNaN に置き換える
       if (isNaN(pageNo)) {
-        $location.url('/1');
+        $location.url('/main/1');
       }
       $scope.pageNo = pageNo;
     })();
@@ -28,10 +30,6 @@ angular.module('ben33App')
           $scope.allEvents = data.result;
           $scope.prevButton = data.prev;
           $scope.nextButton = data.next;
-          console.log(data.result);
-          console.log(data.prev);
-          console.log(data.next);
-          console.log(data);
         })
         .catch(function (msg) {
           if (!msg) {
@@ -49,7 +47,7 @@ angular.module('ben33App')
       }
 
       $scope.pageNo = $scope.pageNo - 1;
-      $location.path('/' + $scope.pageNo);
+      $location.path('/main/' + $scope.pageNo);
       $scope.indexview();
     };
 
@@ -59,7 +57,7 @@ angular.module('ben33App')
       }
 
       $scope.pageNo = $scope.pageNo + 1;
-      $location.path('/' + $scope.pageNo);
+      $location.path('/main/' + $scope.pageNo);
       $scope.indexview();
     };
   }]);
