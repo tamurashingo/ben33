@@ -26,46 +26,31 @@
  */
 
 var mongoose = require('mongoose'),
-    Schema = mongoose.Schema,
-    AttendSchema = require('./attend.model');
+    Schema = mongoose.Schema;
 
 
 /**
- * イベント情報
+ * 参加情報
+ *
  */
-var EventSchema = new Schema({
-  /** イベント名 */
-  eventName: String,
-  /** 開始日時 */
-  startDate: String,
-  /** 終了日時 */
-  endDate: String,
-
-  /** イベント管理者情報 */
-  mgrName: String,
-  
-  /** 開催場所 */
-  venue: String,
-
-  /** イベント参加者情報 */
-  attends: [AttendSchema],
-
-  /** イベント概要 */
-  abstraction: String,
-  /** イベント詳細 */
-  comment: String,
-
-  /** イベント作成者情報 */
-  createdBy: {
+var AttendSchema = new Schema({
+  /** イベント情報 */
+  eventid: {
+    type: Schema.ObjectId,
+    ref: 'Event'
+  },
+  /** ユーザ情報 */
+  userid: {
     type: Schema.ObjectId,
     ref: 'User'
   },
-
-  /** イベント情報作成日時 */
-  createDate: Date,
-  /** イベント情報更新日時 */
+  /** 参加／キャンセル */
+  attendtype: String,
+  /** コメント */
+  comment: String,
+  /** 更新日時 */
   updateDate: Date
 });
 
-module.exports = mongoose.model('Event', EventSchema);
+module.exports = mongoose.model('Attend', AttendSchema);
 

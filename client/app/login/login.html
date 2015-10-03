@@ -1,0 +1,74 @@
+<div class="container" ng-controller="LoginCtrl">
+  <div class="row">
+    <div class="col-md-12">
+      <h1 class="page-header">ログイン</h1>
+
+      <div class="well">
+        <form name="loginForm" class="form-horizontal">
+          <fieldset>
+            <div class="form-group">
+              <label for="username" class="col-lg-2 control-label">メールアドレス</label>
+              <div class="col-lg-6">
+                <input type="email" class="form-control" ng-model="userid" name="userid" required>
+              </div>
+              <div class="col-lg-4">
+                <span ng-show="loginForm.userid.$error.email">
+                  <icon-material-red-A400 class="fa fa-exclamation-triangle">形式が不正です</icon-material-red-A400>
+                </span>
+                <span ng-show="loginForm.userid.$error.required">
+                  <icon-material-red-A400 class="fa fa-exclamation-triangle">未入力</icon-material-red-A400>
+                </span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="password" class="col-lg-2 control-label">パスワード</label>
+              <div class="col-lg-6">
+                <input type="password" class="form-control" ng-model="password" name="password" required>
+              </div>
+              <div class="col-lg-4">
+                <span ng-show="loginForm.password.$error.required">
+                  <icon-material-red-A400 class="fa fa-exclamation-triangle">未入力</icon-material-red-A400>
+                </span>
+              </div>
+            </div>
+          </fieldset>
+
+          <div align="center">
+            <button class="btn btn-material-pink-500 btn-raised" ng-click="login()" ng-disabled="loginForm.$invalid">
+              <span>ログイン</span>
+            </button>
+          </div>
+
+          <div align="center">
+            <button class="btn btn-material-blue-600 btn-raised" ng-click="">
+              <span><i class="fa fa-lg fa-facebook-official"></i>&nbsp;&nbsp;Facebookでログイン</span>
+            </button>
+
+            <button class="btn btn-material-red btn-raised" ng-click="">
+              <span><i class="fa fa-lg fa-google"></i>&nbsp;&nbsp;Googleアカウントでログイン</span>
+            </button>
+
+            <button class="btn btn-material-light-blue-500 btn-raised" ng-click="">
+              <span><i class="fa fa-lg fa-twitter"></i>&nbsp;&nbsp;Twitterでログイン</span>
+            </button>
+          </div>
+        </form>
+      </div><!-- well -->
+
+
+      <br />
+
+      <div align="center">
+        <a class="btn btn-primary btn-flat" ui-sref="signup()">
+          <span>アカウント登録はこちら</span>
+        </a>
+      </div>
+
+    </div><!-- col-md-12 -->
+  </div><!-- row -->
+
+<!-- a ui-sref="signup()">Click here to Signup</a -->
+
+</div><!-- container -->
+

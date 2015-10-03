@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('ben33App')
-  .factory('mainService', ['$q', '$http', function ($q, $http) {
+  .factory('mainService', ['$q', '$http', '$state', function ($q, $http, $state) {
 
     function view(pageNo) {
       var url = '/api/event/page/' + ((pageNo -1) * 10),
@@ -12,6 +12,15 @@ angular.module('ben33App')
           res.resolve(data);
         })
         .error(function (data, status, headers, config) {
+console.log("error");
+console.log(data);
+console.log(status);
+console.log(headers);
+console.log(config);
+          if (status === 401) {
+            $state.go('login');
+            res.reject('セッションが切れました。<br />再ログインしてください。');
+          }
           res.reject();
         });
 
