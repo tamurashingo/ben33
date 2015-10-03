@@ -3,30 +3,35 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var crypto = require('crypto');
-var authTypes = ['ldap'];
+var authTypes = ['local', 'facebook', 'google', 'twitter'];
+var AttendSchema = require('../event/attend.model');
 
 var UserSchema = new Schema({
   /**
-   * ログインに使用するID
+   * ユーザ名
    */
-  userId: String,
-  /**
-   * 画面に表示する名前
-   * LDAP等の場合はそこから取得する。
-   * データベースの場合はあとからユーザ自身で変えられるようにする？
-   */
-  name: String,
+  username: String,
   /**
    * メールアドレス
-   * LDAP等の場合はそこから取得する。
-   * データベースの場合はあとからユーザ自身で変えられるようにする
    */
   email: String,
   hashedPassword: String,
   /** 認証方式 */
   provider: String,
+  /** イベント情報 */
+  events:[AttendSchema],
   salt: String
 });
+
+UserSchema.index(
+  {
+    email: 1,
+    provider: 1
+  },
+  {
+    unique: true
+  }
+);
 
 /**
  * Virtuals
@@ -47,7 +52,7 @@ UserSchema
   .virtual('profile')
   .get(function() {
     return {
-      'name': this.name
+      'name': this.username
     };
   });
 
@@ -64,36 +69,32 @@ UserSchema
  * Validations
  */
 
-// Validate empty userId
+// Validate empty username
 UserSchema
-  .path('userId')
-  .validate(function(userId) {
-    if (authTypes.indexOf(this.provider) !== -1) return true;
-    return userId.length;
-  }, 'userIdを入力してください');
+  .path('username')
+  .validate(function(username) {
+    return username.length;
+  }, 'usernameを入力してください');
+
+// Validate empty email
+UserSchema
+  .path('email')
+  .validate(function(email) {
+    return email.length;
+  }, 'emailを入力してください');
 
 // Validate empty password
 UserSchema
   .path('hashedPassword')
   .validate(function(hashedPassword) {
-    if (authTypes.indexOf(this.provider) !== -1) return true;
-    return hashedPassword.length;
+    if (this.provider === 'local') {
+      return hashedPassword.length;
+    }
+    else {
+      return true;
+    }
   }, 'パスワードを入力してください');
 
-// Validate userId is not taken
-UserSchema
-  .path('userId')
-  .validate(function(value, respond) {
-    var self = this;
-    this.constructor.findOne({userId: value}, function(err, user) {
-      if(err) throw err;
-      if(user) {
-        if(self.id === user.id) return respond(true);
-        return respond(false);
-      }
-      respond(true);
-    });
-}, 'そのuserIdはすでに使用されています');
 
 var validatePresenceOf = function(value) {
   return value && value.length;
@@ -106,8 +107,9 @@ UserSchema
   .pre('save', function(next) {
     if (!this.isNew) return next();
 
-    if (!validatePresenceOf(this.hashedPassword) && authTypes.indexOf(this.provider) === -1)
+    if (this.provider === 'local' && !validatePresenceOf(this.hashedPassword)) {
       next(new Error('Invalid password'));
+    }
     else
       next();
   });
@@ -124,7 +126,12 @@ UserSchema.methods = {
    * @api public
    */
   authenticate: function(plainText) {
-    return this.encryptPassword(plainText) === this.hashedPassword;
+    if (this.provider === 'local') {
+      return this.encryptPassword(plainText) === this.hashedPassword;
+    }
+    else {
+      return false;
+    }
   },
 
   /**

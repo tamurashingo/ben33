@@ -27,6 +27,7 @@
 
 var express = require('express');
 var controller = require('./event.controller');
+var auth = require('../../auth/auth.service');
 
 var router = express.Router();
 
@@ -115,6 +116,7 @@ router.get('/desc/:id', controller.show);
  *     - id: id
  *     - userName: ユーザ名
  */
+router.post('/', auth.isAuthenticated);
 router.post('/', controller.regist);
 
 

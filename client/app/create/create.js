@@ -6,6 +6,9 @@ angular.module('ben33App')
       .state('create', {
         url: '/create',
         templateUrl: 'app/create/create.html',
-        controller: 'CreateCtrl'
+        controller: 'CreateCtrl',
+        data: {
+          requiresLogin: true
+        }
       });
   }]);
