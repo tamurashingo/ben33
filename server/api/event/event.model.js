@@ -41,14 +41,11 @@ var EventSchema = new Schema({
   /** 終了日時 */
   endDate: String,
 
-  /** イベント管理者情報 */
-  mgrName: String,
-  
   /** 開催場所 */
   venue: String,
 
   /** イベント参加者情報 */
-  attends: [AttendSchema],
+  attends: [{type: Schema.ObjectId, ref: 'Attend'}],
 
   /** イベント概要 */
   abstraction: String,

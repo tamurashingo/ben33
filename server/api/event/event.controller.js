@@ -26,9 +26,16 @@
  */
 
 var Event = require('./event.model');
+var Attend = require('./attend.model');
+var User = require('../user/user.model');
 var logic = require('./event.logic');
+var auth = require('../../auth/auth.service');
 var _ = require('lodash');
 
+/**
+ * 一覧情報の取得
+ *
+ */
 exports.index = function (req, res) {
   logic.getEventIndex(req.params)
     .then(function (result) {
@@ -36,105 +43,138 @@ exports.index = function (req, res) {
     });
 };
 
+/**
+ * 詳細画面の取得
+ *
+ */
 exports.show = function (req, res) {
-  Event.findById(req.params.id, function (err, event) {
-    if (err) {
-      console.log(err);
-      return handleError(res, err);
-    }
-    if (!event) {
-      console.log('not found');
-      return res.send(404);
-    }
-    return res.json(event);
-  });
-};
-
-
-exports.description = function (req, res) {
-  // req.eventId
-  logic.getEventDetail(req.params)
+  logic.getEventDetail(req.params.id)
     .then(function (result) {
-      console.log('ok');
-      res.json(result);
+      res.json({
+        result: true,
+        event: result
+      });
+    })
+    .catch(function (error) {
+      res.json({
+        result: false,
+        message: error.message,
+        desc: error.desc
+      });
     });
 };
 
 
+/**
+ * イベント登録
+ *
+ */
 exports.regist = function (req, res) {
-  var param = logic.convertRegistParam(req.body);
+  var userid = auth.decode(req.headers.authorization.split(' ')[1]).userid,
+      param = logic.convertRegistParam(req.body, userid);
   logic.regist(param)
     .then(function (result) {
-      res.json({result: true,
-                message: 'イベント『' + param.eventName + '』を登録しました'});
+      res.json({
+        result: true,
+        message: 'イベント『' + param.eventName + '』を登録しました'
+      });
     })
     .catch(function (e) {
       console.log("error!");
       console.log(e);
-      res.json({result: false,
-                message: 'イベント登録に失敗しました'});
+      res.json({
+        result: false,
+        message: 'イベント登録に失敗しました'
+      });
     });
 };
 
+
+/**
+ * イベント修正
+ *
+ */
 exports.edit = function (req, res) {
   var param = logic.convertEditParam(req.body),
       eventId = req.body.eventId;
   logic.edit(eventId, param)
     .then(function (result) {
-      res.json({result: true,
-                message: 'イベント『' + param.eventName + '』を更新しました'});
+      res.json({
+        result: true,
+        message: 'イベント『' + param.eventName + '』を更新しました'
+      });
     })
     .catch(function (e) {
       console.log("error!");
       console.log(e);
-      res.json({result: false,
-                message: 'イベント更新に失敗しました'});
+      res.json({
+        result: false,
+        message: 'イベント更新に失敗しました'
+      });
     });
 };
 
 
-exports.update = function (req, res) {
-};
-
-
-exports.preview = function (req, res) {
-  var markUp = logic.preview(req.body.md);
-  res.json({html: markUp});
-};
-
+/**
+ * イベント参加登録
+ */
 exports.entry = function (req, res) {
-  var eventId = req.body.id,
-      attendee = logic.convertEntryParam(req.body);
+  var eventid = req.body.eventid,
+      userid = req.body.userid,
+      comment = req.body.comment,
+      atnd = null;
 
-  logic.entry(eventId, attendee)
-    .then(function (result) {
-      res.json({result: true,
-                message: '参加を受け付けました'});
+  logic.createAttend(eventid, userid, comment)
+    .then(function (attend) {
+      atnd = attend;
+      return logic.entry(eventid, atnd);
     })
-    .catch(function (e) {
-      res.json({result:false,
-                message: '参加登録に失敗しました'});
+    .then(function (event) {
+      return logic.entryuser(userid, atnd);
+    })
+    .then(function (result) {
+      res.json({
+        result: true,
+        message: '参加を受け付けました'
+      });
+    })
+    .catch(function (error) {
+      res.json({
+        result: false,
+        message: '参加登録に失敗しました',
+        error: error
+      });
     });
 };
 
+
+/**
+ * イベントキャンセル登録
+ *
+ */
 exports.cancel = function (req, res) {
-  var eventId = req.body.id,
-      cancel = logic.convertEntryParam(req.body);
+  var eventid = req.body.eventid,
+      userid = req.body.userid,
+      comment = req.body.comment;
 
-  logic.cancel(eventId, cancel)
-    .then(function (result) {
-      res.json({result: true,
-                message: 'キャンセルしました'});
+  logic.createCancel(eventid, userid, comment)
+    .then(function (attend) {
+      return logic.entry(eventid, attend);
     })
-    .catch(function (e) {
-      res.json({result:false,
-                message: 'キャンセルに失敗しました'});
+    .then(function (result) {
+      res.json({
+        result: true,
+        message: 'キャンセルしました'
+      });
+    })
+    .catch(function (error) {
+      res.json({
+        result: false,
+        message: 'キャンセルに失敗しました',
+        error: error
+      });
     });
 };
 
-
-function handleError(res, err) {
-  return res.send(500, err);
-}
 
 

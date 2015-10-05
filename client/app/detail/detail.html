@@ -8,7 +8,7 @@
         <div id="content" ng-bind-html="detail">
         </div>
         <hr />
-        <button class="btn btn-raised btn-material-blue-900" ng-click="edit()">
+        <button class="btn btn-raised btn-material-blue-900" ng-show="iseditable" ng-click="edit()">
           イベント情報の修正
         </button>
       </div>
@@ -18,18 +18,23 @@
     <div class="col-md-4">
       <div class="panel panel-material-pink">
         <div class="panel-body">
-          <button class="btn btn-default btn-flat" style="width:100%" ng-click="entry()">このイベントに申し込む</button>
+          <span ng-show="!isentried">
+            <button class="btn btn-default" style="width:100%" ng-click="entry()">このイベントに申し込む</button>
+          </span>
+          <span ng-show="isentried">
+            <button class="btn btn-default" style="width:100%" ng-click="cancel()">このイベントをキャンセル</button>
+          </span>
         </div>
       </div>
 
       <div class="panel panel-material-pink">
         <div class="panel-heading">
-          参加者 ({{event.attendees.length}}人)
+          参加者 ({{event.attends.length}}人)
         </div>
         <div class="panel-body">
-          <div class="thumb" ng-repeat="attendee in event.attendees">
-            <p class="name"><a ng-click="cancel(attendee.userName)" href="">{{$index + 1}}:{{attendee.userName}}</a></p>
-            <p class="comment">{{attendee.comment}}</p>
+          <div class="thumb" ng-repeat="attend in event.attends">
+            <p class="name"><a ng-href="/profile/detail/{{attend.userid}}">{{$index + 1}}:{{attend.username}}</a></p>
+            <p class="comment">{{attend.comment}}</p>
           </div><!-- ng-repeat -->
         </div>
       </div>
@@ -40,7 +45,7 @@
         </div>
         <div class="panel-body">
           <div class="thumb" ng-repeat="cancel in event.cancels">
-            <p class="name">{{$index + 1}}:{{cancel.userName}}</a></p>
+            <p class="name"><a ng-href="/profile/detail/{{cancel.userid}}">{{$index + 1}}:{{cancel.username}}</a></p>
             <p class="comment">{{cancel.comment}}</p>
           </div><!-- ng-repeat -->
         </div>

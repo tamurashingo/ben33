@@ -3,68 +3,13 @@
 angular.module('ben33App')
   .factory('detailService', ['$rootScope', '$q', '$http', '$sce', '$modal', 'growl', 'Util', function ($rootScope, $q, $http, $sce, $modal, growl, Util) {
 
-    function entryEvent(eventId, userName, comment) {
+    function entryEvent(eventId, userId, comment) {
       var res = $q.defer();
       $http.post('/api/event/entry', {
-        id: eventId,
-        userName: userName,
+        eventid: eventId,
+        userid: userId,
         comment: comment
       })
-        .success(function (data, status, headers, config) {
-          if (angular.isDefined(data.result) && data.result) {
-            res.resolve(data.message);
-          }
-          else if (angular.isUndefined(data.result)) {
-            res.reject('サーバエラーです。<br />管理者に連絡してください。');
-          }
-          else if (data.result == false) {
-            res.reject(data.message);
-          }
-          // not reached
-          res.reject('FATAL ERROR!!');
-        })
-        .error(function (data, status, headers, config) {
-          res.reject('サーバエラーです。<br />管理者に連絡してください。');
-        });
-
-      return res.promise;
-    }
-
-    function cancelEvent(eventId, userName, comment) {
-      console.log(userName);
-      var res = $q.defer();
-      $http.post('/api/event/cancel', {
-        id: eventId,
-        userName: userName,
-        comment: comment
-      })
-        .success(function (data, status, headers, config) {
-          if (angular.isDefined(data.result) && data.result) {
-            res.resolve(data.message);
-          }
-          else if (angular.isUndefined(data.result)) {
-            res.reject('サーバエラーです。<br />管理者に連絡してください。');
-          }
-          else if (data.result == false) {
-            res.reject(data.message);
-          }
-          // not reached
-          res.reject('FATAL ERROR!!');
-        })
-        .error(function (data, status, headers, config) {
-          res.reject('サーバエラーです。<br />管理者に連絡してください。');
-        });
-
-      return res.promise;
-    }
-
-    
-
-    function detail(eventId) {
-      var url = '/api/event/desc/' + eventId,
-          res = $q.defer();
-
-      $http.get(url)
         .success(function (data, status, headers, config) {
           res.resolve(data);
         })
@@ -75,11 +20,50 @@ angular.module('ben33App')
       return res.promise;
     }
 
+    function cancelEvent(eventId, userId, comment) {
+      var res = $q.defer();
+      $http.post('/api/event/cancel', {
+        eventid: eventId,
+        userid: userId,
+        comment: comment
+      })
+        .success(function (data, status, headers, config) {
+          res.resolve(data);
+        })
+        .error(function (data, status, headers, config) {
+          res.reject();
+        });
+
+      return res.promise;
+    }
+
+    function detail(eventId) {
+      var url = '/api/event/desc/' + eventId,
+          res = $q.defer();
+
+      $http.get(url)
+        .success(function (data, status, headers, config) {
+          if (angular.isDefined(data.result) && data.result) {
+            res.resolve(data.event);
+          }
+          else {
+            res.reject(data.message);
+          }
+        })
+        .error(function (data, status, headers, config) {
+          res.reject('サーバエラーです');
+        });
+
+      return res.promise;
+    }
+
     function view(eventId) {
       var res = $q.defer();
       
       detail(eventId)
         .then(function (event) {
+          console.log('view');
+          console.log(event);
           var html = Util.md2html(createMarkdown(event));
           res.resolve({html: html,
                        event: event});
@@ -154,68 +138,10 @@ angular.module('ben33App')
     }
 
 
-    function openEntryModal(id) {
-      var scope = $rootScope.$new(),
-          res = $q.defer(),
-          modal;
-
-      scope.userName = "";
-      scope.comment = "";
-      
-      scope.entry = function () {
-        modal.close();
-        entryEvent(id, scope.userName, scope.comment)
-          .then(function (message) {
-            res.resolve(message);
-          },
-          function (message) {
-            res.reject(message);
-          });
-      };
-      scope.dismiss = function () {
-        modal.close();
-      };
-      modal = $modal.open({
-        templateUrl: 'entry.html',
-        scope: scope
-      });
-
-      return res.promise;
-    }
-
-
-    function openCancelModal(id, userName) {
-      var scope = $rootScope.$new(),
-          res = $q.defer(),
-          modal;
-
-      scope.comment = "";
-
-      scope.cancel = function () {
-        modal.close();
-        cancelEvent(id, userName, scope.comment)
-          .then(function (message) {
-            res.resolve(message);
-          },
-          function (message) {
-            res.reject(message);
-          });
-      };
-      scope.dismiss = function () {
-        modal.close();
-      };
-      modal = $modal.open({
-        templateUrl: 'cancel.html',
-        scope: scope
-      });
-
-      return res.promise;
-    }
-
     return {
       view: view,
-      entry: openEntryModal,
-      cancel: openCancelModal
+      entryEvent: entryEvent,
+      cancelEvent: cancelEvent
     };
     
   }])

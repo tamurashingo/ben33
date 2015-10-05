@@ -126,6 +126,7 @@ router.post('/', controller.regist);
  *   - userName: ユーザ名
  *   - comment: コメント
  */
+router.post('/', auth.isAuthenticated);
 router.post('/entry', controller.entry);
 
 
@@ -136,20 +137,16 @@ router.post('/entry', controller.entry);
  *   - userName: ユーザ名
  *   - comment: コメント
  */
+router.post('/', auth.isAuthenticated);
 router.post('/cancel', controller.cancel);
 
 /**
  * イベント情報修正
  *
  */
+router.post('/', auth.isAuthenticated);
 router.put('/edit', controller.edit);
 
-
-/**
- * プレビュー
- *
- */
-//router.post('/preview', controller.preview);
 
 module.exports = router;
 
