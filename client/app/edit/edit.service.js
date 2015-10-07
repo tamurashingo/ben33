@@ -12,6 +12,19 @@ angular.module('ben33App')
           res = $q.defer();
       $http.get(url)
         .success(function (data, status, headers, config) {
+          if (angular.isDefined(data.result) && data.result) {
+            res.resolve({
+              result: true,
+              data: data.event
+            });
+          }
+          else {
+            res.resolve({
+              result: false,
+              message: data.message,
+              desc: data.desc
+            });
+          }
           res.resolve(data);
         })
         .error(function (data, status, headers, config) {

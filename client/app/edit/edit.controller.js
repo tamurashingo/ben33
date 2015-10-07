@@ -8,28 +8,34 @@ angular.module('ben33App')
     /*-
      * データ取得
      */
-    editService.detail(eventId)
-      .then(function (data) {
-        $scope.eventName = data.eventName;
-        $scope.startDate = data.startDate;
-        $scope.endDate = data.endDate;
-        $scope.venue = data.venue;
-        $scope.mgr = data.mgrName;
-        $scope.abstraction = data.abstraction;
-        $scope.desc = data.comment;
-      })
-      .catch(function () {
-        $scope.eventName = '';
-        $scope.startDate = '';
-        $scope.endDate = '';
-        $scope.venue = '';
-        $scope.mgr = '';
-        $scope.abstraction = '';
-        $scope.desc = '';
-        growl.addErrorMessage('<i class="fa fa-exclamation-triangle"></i> サーバエラー', {ttl: -1});
-      });
+    (function () {
+      $scope.eventName = '';
+      $scope.startDate = '';
+      $scope.endDate = '';
+      $scope.venue = '';
+      $scope.mgr = '';
+      $scope.abstraction = '';
+      $scope.desc = '';
+      editService.detail(eventId)
+        .then(function (data) {
+          if (data.result) {
+            $scope.eventName = data.data.eventName;
+            $scope.startDate = data.data.startDate;
+            $scope.endDate = data.data.endDate;
+            $scope.venue = data.data.venue;
+            $scope.mgr = data.data.mgrName;
+            $scope.abstraction = data.data.abstraction;
+            $scope.desc = data.data.comment;
+          }
+          else {
+            growl.addErrorMessage('<i class="fa fa-exclamation-triangle"></i> ' + data.message, {ttl: 5000});
+          }
+        })
+        .catch(function () {
+          growl.addErrorMessage('<i class="fa fa-exclamation-triangle"></i> サーバエラー', {ttl: -1});      
+        });
+    })();
 
-    
 
     function createParam(scope) {
       var param = {
