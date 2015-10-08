@@ -60,6 +60,8 @@ function getEventModelAll(pageNo) {
       .sort({
         createDate: 'desc'
       })
+      .populate('attends', 'attendtype')
+      .populate('createdBy', 'username')
       .exec(function (err, events) {
         if (err) {
           reject(err);
