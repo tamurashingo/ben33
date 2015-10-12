@@ -23,7 +23,7 @@ angular.module('ben33App')
             $scope.startDate = data.data.startDate;
             $scope.endDate = data.data.endDate;
             $scope.venue = data.data.venue;
-            $scope.mgr = data.data.mgrName;
+            $scope.ownername = data.data.createdBy.username;
             $scope.abstraction = data.data.abstraction;
             $scope.desc = data.data.comment;
           }
@@ -64,7 +64,6 @@ angular.module('ben33App')
       'startDate',
       'endDate',
       'venue',
-      'mgr',
       'abstraction',
       'desc'],
       function(oldVal, newVal) {

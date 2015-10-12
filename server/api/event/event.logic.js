@@ -120,7 +120,7 @@ function convertRows(rows) {
 function getEvent(eventid) {
   return new Promise(function (resolve, reject) {
     Event.findById(eventid,
-      'eventName startDate endDate venue attends abstaction comment createdBy createDate updateDate')
+      'eventName startDate endDate venue attends abstraction comment createdBy createDate updateDate')
       .exec(function (error, event) {
         if (error) {
           reject({
