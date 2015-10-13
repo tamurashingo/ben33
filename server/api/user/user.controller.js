@@ -49,8 +49,10 @@ exports.signup = function (req, res) {
 exports.getOwnProfile = function (req, res) {
   var userid = auth.decode(req.headers.authorization.split(' ')[1]).userid;
 
-console.log(req.headers.authorization);
-console.log("userid:" + userid);
+  console.log('getOwnProfile');
+  console.log('userid:' + userid);
+  console.log(auth.decode(req.headers.authorization.split(' ')[1]));
+
   
   logic.getUser(userid)
     .then(function (user) {
@@ -92,18 +94,23 @@ exports.updateProfile = function (req, res) {
 };
 
 exports.getProfile = function (req,res) {
-  var userid = req.params.id;
-console.log("getProfile");
-console.log(req.params);
-console.log("userid:" + userid);
-
+  var userid = req.params.id,
+      u = {};
   logic.getUser(userid)
-    .then(function (result) {
+    .then(function (user) {
+      console.log('getProfile');
+      console.log(user);
+      u = user;
+      return logic.getAttend(user.events);
+    })
+    .then(function (event) {
+      console.log('getAttend -->');
+      console.log(event);
       res.json({
         result: true,
-        userid: result.id,
-        username: result.username,
-        events: result.events
+        userid: u.userid,
+        username: u.username,
+        events: event
       });
     })
     .catch(function (error) {

@@ -1,7 +1,9 @@
-<div class="container"  ng-controller="CreateCtrl">
+<div class="container"  ng-controller="EditCtrl">
+  <div growl></div>
+  
   <div class="row">
     <div class="col-md-12">
-      <h1 class="page-header">イベント作成</h1>
+      <h1 class="page-header">イベント情報の修正</h1>
     </div>
   </div><!-- row -->
   <div class="row">
@@ -51,7 +53,7 @@
               <label for="mgr" class="col-lg-2 control-label">イベント管理者</label>
               <div class="col-lg-10">
                 <p class="form-control-static">
-                  {{owner.username}}
+                  {{ownername}}
                 </p>
               </div>
             </div>
@@ -86,8 +88,8 @@
           <div id="preview" ng-bind-html="preview">
           </div>
           <div align="right">
-            <button class="btn btn-material-pink-500 btn-raised" ng-click="regist()" ng-disabled="eventForm.$invalid || !registButton">
-              <span>作成</span>
+            <button class="btn btn-material-blue-900 btn-raised" ng-click="edit()" ng-disabled="eventForm.$invalid">
+              <span>修正</span>
             </button>
           </div>
         </form>

@@ -26,7 +26,10 @@
  */
 
 var User = require('./user.model');
+var EventDAO = require('../event/event.dao');
+var AttendDAO = require('../event/attend.dao');
 var Promise = require('bluebird');
+var _ = require('lodash');
 
 /**
  * ユーザ登録。
@@ -77,6 +80,24 @@ function getUser(userid) {
     });
   });
 }
+
+function getAttend(attendid) {
+  return new Promise(function(resolve, reject) {
+    Promise.all(attendid.map(function (id) {
+      console.log('attendid -->' + id);
+      return AttendDAO.getEventname(id);
+    }))
+      .then(function (result) {
+        console.log('getAttend  result -->');
+        console.log(result);
+        resolve(result);
+      })
+      .catch(function (error) {
+        reject(error);
+      });
+  });
+}
+
 
 /**
  * ユーザ情報を更新する
@@ -147,4 +168,4 @@ function handleSearchError(err) {
 exports.signup = signup;
 exports.getUser = getUser;
 exports.updateUser = updateUser;
-
+exports.getAttend = getAttend;

@@ -4,37 +4,51 @@ describe('Controller: DetailCtrl', function () {
   var scope;
 
   // load the controller's module
-  beforeEach(module('ben33App'));
+  beforeEach(function () {
+    module('ben33App');
+    module('ngMockE2E');
+    module(function ($urlRouterProvider) {
+      $urlRouterProvider.deferIntercept();
+    });
+  });
+
 
   beforeEach(inject(function ($rootScope) {
     scope = $rootScope.$new();
   }));
 
-  describe('各カラムの変換の確認', function () {
+  describe('各カラムの変換の確認 参加:0 キャンセル:0', function () {
     var DetailCtrl,
         $httpBackend,
-        stateParams;
+        stateParams,
+        response = {
+          result: true,
+          event: {
+            _id: 1,
+            eventName: 'イベント名',
+            startDate: '12:00',
+            endDate: '13:00',
+            createdBy: {
+              _id: 2,
+              username: 'イベント管理者'
+            },
+            venue: '開催場所',
+            attends: [
+            ],
+            cancels: [
+            ],
+            abstraction: 'イベント概要',
+            comment: 'イベント詳細',
+            createDate: '2015-04-01 00:00:00',
+            updateDate: '2015-04-01 10:00:00'
+          }
+        };
 
     beforeEach(inject(function ($controller, _$httpBackend_) {
       stateParams = {eventId: 1};
       $httpBackend = _$httpBackend_;
       $httpBackend.expectGET('/api/event/desc/1')
-        .respond({
-          _id: 1,
-          eventName: 'イベント名',
-          startDate: '12:00',
-          endDate: '13:00',
-          mgrId: 11,
-          venue: '開催場所',
-          attendeeId: 21,
-          abstraction: 'イベント概要',
-          comment: 'イベント詳細',
-          attachId: 31,
-          createdBy: 41,
-          createDate: '2015-04-01 00:00:00',
-          updateDate: '2015-04-01 10:00:00',
-          userName: 'イベント管理者'
-        });
+        .respond(response);
       DetailCtrl = $controller('DetailCtrl', {
         $scope: scope,
         $stateParams: stateParams

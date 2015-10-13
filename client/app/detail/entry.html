@@ -1,0 +1,50 @@
+<div class="container">
+  <div class="row">
+    <h1 class="page-header">参加登録</h1>
+    <div class="col-md-8">
+      <div class="well">
+        <div id="content">
+          <h1>{{event.eventName}}</h1>
+          <h3><i class="fa fa-calendar"></i> {{event.startDate}} ～ {{event.endDate}}</h3>
+          <h3><i class="fa fa-map-marker"></i> {{event.venue}}</h3>
+        </div>
+        <hr />
+        <div class="form-group">
+          <label for="comment" class="col-lg-2 control-label">参加コメント</label>
+          <div class="col-lg-10">
+            <textarea class="form-control" rows="3" ng-model="comment" id="comment"></textarea>
+          </div>
+        </div>
+        <br />
+        <button type="button" class="btn btn-primary" style="width: 100%;" ng-click="entry()">申し込み！</button><br />
+        <button type="button" class="btn btn-default btn-flat" style="width: 100%;" ng-click="back(event._id)">戻る</button>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="panel panel-material-pink">
+        <div class="panel-heading">
+          参加者 ({{event.attends.length}}人)
+        </div>
+        <div class="panel-body">
+          <div class="thumb" ng-repeat="attend in event.attends">
+            <p class="name"><a ng-href="/profile/detail/{{attend.userid}}">{{attend.username}}</a></p>
+            <p class="comment">{{attend.comment}}</p>
+          </div><!-- ng-repeat -->
+        </div>
+      </div>
+
+      <div class="panel panel-material-pink">
+        <div class="panel-heading">
+          キャンセル ({{event.cancels.length}}人)
+        </div>
+        <div class="panel-body">
+          <div class="thumb" ng-repeat="cancel in event.cancels">
+            <p class="name"><a ng-href="/profile/detail/{{cancel.userid}}">{{cancel.username}}</a></p>
+            <p class="comment">{{cancel.comment}}</p>
+          </div><!-- ng-repeat -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

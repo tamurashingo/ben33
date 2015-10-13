@@ -119,19 +119,34 @@ router.get('/desc/:id', controller.show);
 router.post('/', auth.isAuthenticated);
 router.post('/', controller.regist);
 
+
 /**
- * イベント情報更新
- *
- *
+ * イベント参加登録
+ * - リクエストパラメータ
+ *   - userName: ユーザ名
+ *   - comment: コメント
  */
-//router.put('/:eventId', controller.update);
+router.post('/', auth.isAuthenticated);
+router.post('/entry', controller.entry);
 
 
 /**
- * プレビュー
+ * イベントキャンセル
+ * 同名のユーザがいた場合は一緒にキャンセルされます
+ * - リクエストパラメータ
+ *   - userName: ユーザ名
+ *   - comment: コメント
+ */
+router.post('/', auth.isAuthenticated);
+router.post('/cancel', controller.cancel);
+
+/**
+ * イベント情報修正
  *
  */
-//router.post('/preview', controller.preview);
+router.post('/', auth.isAuthenticated);
+router.put('/edit', controller.edit);
+
 
 module.exports = router;
 

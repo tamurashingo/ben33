@@ -24,7 +24,9 @@
         </div>
         <div class="panel-body">
           開催日時：{{event.startDate}} ～ {{event.endDate}}<br />
-          開催場所：{{event.venue}}
+          開催場所：{{event.venue}}<br />
+          主催者：{{event.createdBy.username}}<br />
+          参加者：{{(event.attends|filter:{attendtype: 'attend'}).length}}人
           <div align="right">
             <a ng-href="/detail/{{event._id}}" class="btn btn-fab btn-material-pink mdi-action-launch">
             </a>

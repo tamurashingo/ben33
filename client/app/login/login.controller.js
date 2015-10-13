@@ -18,6 +18,9 @@ angular.module('ben33App')
         if ($scope.returnToState === '/create') {
           $location.path('/create');
         }
+        else if ($scope.returnToState.startsWith('/detail/entry/')) {
+          $location.path('/detail/entry/' + $scope.returnToStateParams.eventId);
+        }
         else {
           $location.path('/');
         }

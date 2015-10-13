@@ -29,6 +29,8 @@ module.exports = function(config) {
       'client/bower_components/angular-growl/build/angular-growl.js',
       'client/bower_components/angular-animate/angular-animate.js',
       'client/bower_components/jasmine-jquery/lib/jasmine-jquery.js',
+      'client/bower_components/angular-jwt/dist/angular-jwt.js',
+      'client/bower_components/a0-angular-storage/dist/angular-storage.js',
       'client/app/app.js',
       'client/app/app.coffee',
       'client/app/**/*.js',

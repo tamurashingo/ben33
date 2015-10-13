@@ -1,13 +1,15 @@
 'use strict';
 
 angular.module('ben33App')
-  .factory('detailService', ['$q', '$http', '$sce', 'Util', function ($q, $http, $sce, Util) {
+  .factory('detailService', ['$rootScope', '$q', '$http', '$sce', '$modal', 'growl', 'Util', function ($rootScope, $q, $http, $sce, $modal, growl, Util) {
 
-    function detail(eventId) {
-      var url = '/api/event/desc/' + eventId,
-          res = $q.defer();
-
-      $http.get(url)
+    function entryEvent(eventId, userId, comment) {
+      var res = $q.defer();
+      $http.post('/api/event/entry', {
+        eventid: eventId,
+        userid: userId,
+        comment: comment
+      })
         .success(function (data, status, headers, config) {
           res.resolve(data);
         })
@@ -18,13 +20,53 @@ angular.module('ben33App')
       return res.promise;
     }
 
+    function cancelEvent(eventId, userId, comment) {
+      var res = $q.defer();
+      $http.post('/api/event/cancel', {
+        eventid: eventId,
+        userid: userId,
+        comment: comment
+      })
+        .success(function (data, status, headers, config) {
+          res.resolve(data);
+        })
+        .error(function (data, status, headers, config) {
+          res.reject();
+        });
+
+      return res.promise;
+    }
+
+    function detail(eventId) {
+      var url = '/api/event/desc/' + eventId,
+          res = $q.defer();
+
+      $http.get(url)
+        .success(function (data, status, headers, config) {
+          if (angular.isDefined(data.result) && data.result) {
+            res.resolve(data.event);
+          }
+          else {
+            res.reject(data.message);
+          }
+        })
+        .error(function (data, status, headers, config) {
+          res.reject('サーバエラーです');
+        });
+
+      return res.promise;
+    }
+
     function view(eventId) {
       var res = $q.defer();
       
       detail(eventId)
         .then(function (event) {
+          console.log('view');
+          console.log(event);
           var html = Util.md2html(createMarkdown(event));
-          res.resolve(html);
+          res.resolve({html: html,
+                       event: event});
         });
 
       return res.promise;
@@ -76,10 +118,10 @@ angular.module('ben33App')
           + event.venue;
       }
       // イベント管理者
-      if (event.userName) {
+      if (event.createdBy.username) {
         str = str + '\n'
           + '#### <i class="fa fa-user"></i> '
-          + event.userName;
+          + event.createdBy.username;
       }
       
       
@@ -95,8 +137,11 @@ angular.module('ben33App')
       return str;
     }
 
+
     return {
-      view: view
+      view: view,
+      entryEvent: entryEvent,
+      cancelEvent: cancelEvent
     };
     
   }])

@@ -25,34 +25,48 @@
  *
  */
 
-var mongoose = require('mongoose'),
-    Schema = mongoose.Schema;
+var Event = require('./event.model');
+var Promise = require('bluebird');
+var _ = require('lodash');
 
 
-/**
- * 参加情報
- *
- */
-var AttendSchema = new Schema({
-  /** イベント情報 */
-  eventid: {
-    type: Schema.ObjectId,
-    ref: 'Event'
-  },
-  /** ユーザ情報 */
-  userid: {
-    type: Schema.ObjectId,
-    ref: 'User'
-  },
-  /** イベント名 */
-  eventname: String,
-  /** 参加／キャンセル */
-  attendtype: String,
-  /** コメント */
-  comment: String,
-  /** 更新日時 */
-  updateDate: Date
-});
+function getEvent(eventid) {
+  return new Promise(function (resolve, reject) {
+    Event.findById(eventid)
+      .exec(function (error, event) {
+        if (error) {
+          reject({
+            result: false,
+            message: 'データベースエラー',
+            desc: error
+          });
+        }
 
-module.exports = mongoose.model('Attend', AttendSchema);
+        if (!event) {
+          reject({
+            result: false,
+            message: 'イベントが見つかりません',
+            desc: ''
+          });
+        }
+        resolve(event);
+      });
+  });
+}
+
+exports.getEvent = function (eventid) {
+  return getEvent(eventid);
+};
+
+exports.getAttend = function (eventid) {
+  return new Promise(function (resolve, reject) {
+    getEvent(eventid)
+      .then(function (event) {
+        resolve(event.attends);
+      })
+      .catch(function (error) {
+        reject(error);
+      });
+  });
+};
 
