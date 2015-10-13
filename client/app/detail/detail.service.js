@@ -118,10 +118,10 @@ angular.module('ben33App')
           + event.venue;
       }
       // イベント管理者
-      if (event.mgrName) {
+      if (event.createdBy.username) {
         str = str + '\n'
           + '#### <i class="fa fa-user"></i> '
-          + event.mgrName;
+          + event.createdBy.username;
       }
       
       

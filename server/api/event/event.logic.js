@@ -71,10 +71,10 @@ function getEventModelAll(pageNo) {
             reject(err);
           }
           resolve({
-            prev: pageNo == 0 ? false : true,
+            prev: pageNo === 0 ? false : true,
             next: (pageNo * 10) + events.length < count ? true : false,
             result: events,
-            total: Math.floor(count / 10) + 1
+            total: count === 0 ? 1 : Math.floor((count - 1)/ 10) + 1
           });
         });
       });

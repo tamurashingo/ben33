@@ -524,7 +524,39 @@ module.exports = function (grunt) {
         }
       }
     },
+    
+    // for coverage
+    mocha_istanbul: {
+      coverage: {
+        src: 'server',
+        options: {
+          mask: '**/*.spec.js',
+          excludes: ['**/*.spec.js']
+        }
+      }
+    },
+    istanbul_check_coverage: {
+      default: {
+        options: {
+          coverageFolder: 'coverage*',
+          check: {
+            line: 80,
+            statements: 80
+          }
+        }
+      }
+    }
   });
+  
+  grunt.event.on('coverage', function (lcovFileContents, done) {
+    // check below on the section "The coverage event"
+    done();
+  });
+  
+  grunt.loadNpmTasks('grunt-mocha-istanbul');
+  
+  grunt.registerTask('coveralls', ['mocha_istanbul:coveralls']);
+  grunt.registerTask('coverage', ['mocha_istanbul:coverage']);
 
   // Used for delaying livereload until after server has restarted
   grunt.registerTask('wait', function () {
@@ -583,7 +615,7 @@ module.exports = function (grunt) {
       return grunt.task.run([
         'env:all',
         'env:test',
-        'mochaTest'
+        'coverage'
       ]);
     }
 
