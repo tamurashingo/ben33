@@ -26,46 +26,23 @@
  */
 
 var mongoose = require('mongoose'),
-    Schema = mongoose.Schema,
-    AttendSchema = require('./attend.model');
-
+    Schema = mongoose.Schema;
 
 /**
- * イベント情報
+ * コメント
  */
-var EventSchema = new Schema({
-  /** イベント名 */
-  eventName: String,
-  /** 開始日時 */
-  startDate: String,
-  /** 終了日時 */
-  endDate: String,
+var CommentSchema = new Schema({
+  /** コメント内容 */
+  content: String,
 
-  /** 開催場所 */
-  venue: String,
-
-  /** イベント参加者情報 */
-  attends: [{type: Schema.ObjectId, ref: 'Attend'}],
-
-  /** イベント概要 */
-  abstraction: String,
-  /** イベント詳細 */
-  comment: String,
-
-  /** イベント作成者情報 */
+  /** コメントした人 */
   createdBy: {
     type: Schema.ObjectId,
     ref: 'User'
   },
 
-  /** コメント */
-  comments: [{type: Schema.ObjectId, ref: 'Comment'}],
-
-  /** イベント情報作成日時 */
-  createDate: Date,
-  /** イベント情報更新日時 */
-  updateDate: Date
+  /** コメント日時 */
+  createDate: Date
 });
 
-module.exports = mongoose.model('Event', EventSchema);
-
+module.exports = mongoose.model('Comment', CommentSchema);    

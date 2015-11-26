@@ -25,15 +25,14 @@
  *
  */
 
-var Event = require('./event.model');
+var Comment = require('./comment.model');
 var Promise = require('bluebird');
-var _ = require('lodash');
 
 
-function getEvent(eventid) {
+function getComment(commentid) {
   return new Promise(function (resolve, reject) {
-    Event.findById(eventid)
-      .exec(function (error, event) {
+    Comment.findById(commentid)
+      .exec(function (error, comment) {
         if (error) {
           reject({
             result: false,
@@ -42,47 +41,49 @@ function getEvent(eventid) {
           });
         }
 
-        if (!event) {
+        if (!comment) {
           reject({
             result: false,
-            message: 'イベントが見つかりません',
+            message: 'コメントが見つかりません',
             desc: ''
           });
         }
-        resolve(event);
+        resolve(comment);
       });
   });
 }
 
-exports.getEvent = function (eventid) {
-  return getEvent(eventid);
+exports.getComment = function (commentid) {
+  return getComment(commentid);
 };
 
-exports.getAttend = function (eventid) {
+exports.insert = function (userid, comment) {
+  var now = (new Date()).toFormat('YYYY/MM/DD HH24:MI:SS'),
+      data = {
+        content: comment,
+        createdBy: userid,
+        createDate: now
+      };
+      
+  console.log("comment insert");
+  console.log(data);
+
   return new Promise(function (resolve, reject) {
-    getEvent(eventid)
-      .then(function (event) {
-        resolve(event.attends);
-      })
-      .catch(function (error) {
-        reject(error);
-      });
+    Comment.create(data, function (error, comment) {
+      if (error) {
+        console.log("error!");
+        console.log(error);
+        reject({
+          result: false,
+          message: 'データベースエラー',
+          desc: error
+        });
+      }
+      else {
+        console.log("ok!");
+        console.log(comment);
+        resolve(comment);
+      }
+    });
   });
 };
-
-exports.getComments = function (eventid) {
-  return new Promise(function (resolve, reject) {
-    getEvent(eventid)
-      .then(function (event) {
-	resolve(event.comments);
-      })
-      .catch(function (error) {
-	reject(error);
-      });
-  });
-};
-
-  
-
-
-    

@@ -177,4 +177,29 @@ exports.cancel = function (req, res) {
 };
 
 
+/**
+ * コメント追加
+ */
+exports.comment = function (req, res) {
+  var eventid = req.body.eventid,
+      userid = req.body.userid,
+      comment = req.body.comment;
 
+  logic.createComment(userid, comment)
+    .then(function (comment) {
+      return logic.entryComment(eventid, comment);
+    })
+    .then(function (result) {
+      res.json({
+        result: true,
+        message: 'コメントを追加しました'
+      });
+    })
+    .catch(function (error) {
+      res.json({
+        result: false,
+        message: 'コメントの追加に失敗しました',
+        error: error
+      });
+    });
+};

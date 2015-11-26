@@ -11,6 +11,29 @@
         <button class="btn btn-raised btn-material-blue-900" ng-show="iseditable" ng-click="edit()">
           イベント情報の修正
         </button>
+      </div><!-- well -->
+      <div class="panel">
+        <div class="panel-heading">
+          コメント
+        </div>
+        <div class="panel-body">
+          <span ng-show="islogin">
+            <input type="text" class="form-control" ng-model="comment" id="comment" style="width:80%;">
+            <button type="button" class="btn btn-primary" ng-click="entryComment()">投稿</button>
+            <hr />
+          </span>
+          <div class="event-comment clearfix" ng-repeat="comment in event.comments | orderBy:'createDate':'reverse'">
+            <div class="thumb">
+              <div class="event-comment-user">
+                <p class="event-comment-name">
+                  <a ng-href="/profile/detail/{{comment.createdBy}}">{{comment.username}}</a>さんが書き込みました。
+                </p>
+                <p class="event-comment-date">{{comment.createDate}}</p>
+              </div>
+              <p class="event-comment-comment">{{comment.comment}}</p>
+            </div>
+          </div><!-- ng-repeat -->
+        </div>
       </div>
     </div><!-- col-md-8 -->
 

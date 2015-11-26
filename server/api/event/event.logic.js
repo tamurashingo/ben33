@@ -34,11 +34,13 @@
 var Event = require('./event.model');
 var Attend = require('./attend.model');
 var User = require('../user/user.model');
+var Comment = require('./comment.model');
 var Promise = require('bluebird');
 var _ = require('lodash');
 var EventDAO = require('./event.dao');
 var AttendDAO = require('./attend.dao');
 var UserDAO = require('../user/user.dao');
+var CommentDAO = require('./comment.dao');
 
 require('date-utils');
 
@@ -120,7 +122,7 @@ function convertRows(rows) {
 function getEvent(eventid) {
   return new Promise(function (resolve, reject) {
     Event.findById(eventid,
-      'eventName startDate endDate venue attends abstraction comment createdBy createDate updateDate')
+      'eventName startDate endDate venue attends comments abstraction comment createdBy createDate updateDate')
       .exec(function (error, event) {
         if (error) {
           reject({
@@ -144,12 +146,92 @@ function getEvent(eventid) {
 }
 
 /**
- *
- *
- *
- *
- *
- *
+ * Event情報からCommentの情報を取得するPromiseを取得します。
+ * @param {Event} event データベースから取得したEvent情報
+ * @return {Promise} resolve: commentsでCommentの配列を得る。
+ *                   reject: {Error}
+ * 
+ */
+function getComments(event) {
+  return new Promise(function (resolve, reject) {
+    eventPopulateComments(event)
+      .then(function (event) {
+        console.log('eventPopulateComments');
+        console.log(event);
+        return commentPopulateUser(event.comments);
+      })
+      .then(function (comment) {
+        var comments = [];
+        console.log('commentPopulateUser');
+        console.log(comment);
+        _.each(comment, function (elm, idx) {
+          console.log('user');
+          console.log(elm);
+          var obj = {
+            username: elm.createdBy.username,
+            userid: elm.createdBy._id,
+            comment: elm.content,
+            createDate: elm.createDate.toFormat('YYYY/MM/DD HH24:MI')
+          };
+        comments.push(obj);
+      });
+      
+      resolve({
+        comments: comments
+      });
+    })
+    .catch(function (error) {
+      reject(error);
+    });
+  });
+}
+
+/**
+ * Event情報から参加者、キャンセル者の情報を取得するPromiseを取得します。
+ * @param {Event} event データベースから取得したEvent情報
+ * @return {Promise} resolve: attendsで参加者情報を、cancelsでキャンセル者情報を得る。
+ *                   reject: {Error} 
+ * 
+ */
+function getAttends(event) {
+  return new Promise(function (resolve, reject) {
+    eventPopulateAttend(event)
+      .then(function (event) {
+        return attendPopulateUser(event.attends);
+      })
+      .then(function (attend) {
+        var attends = [],
+            cancels = [];
+        _.each(attend, function (elm, idx) {
+          var obj = {
+            username: elm.userid.username,
+            userid: elm.userid._id,
+            comment: elm.comment,
+            updateDate: elm.updateDate
+          };
+          if (elm.attendtype === 'attend') {
+            attends.push(obj);
+          }
+          else {
+            cancels.push(obj);
+          }
+        });
+        resolve({
+          attends: attends,
+          cancels: cancels
+        });
+      })
+      .catch(function (error) {
+        reject(error);
+      });
+  });
+};
+
+/**
+ * Event情報からAttend情報の配列を補完します。
+ * @param {Event} event データベースから取得したEvent情報
+ * @return {Promise} Attend情報の配列が補完されたEvent情報
+ * 
  */
 function eventPopulateAttend(event) {
   return new Promise(function (resolve, reject) {
@@ -167,11 +249,44 @@ function eventPopulateAttend(event) {
         });
       }
       console.log('eventPopulateAttend...ok');
-      resolve(event.attends);
+      resolve(event);
     });
   });
 }
 
+/**
+ * Event情報からComment情報の配列を取得します。
+ * @param {Event} event データベースから取得したEvent情報
+ * @return {Promise} Comment情報を補完したEvent情報を得るPromise
+ */
+function eventPopulateComments(event) {
+  return new Promise(function (resolve, reject) {
+    var options = {
+      path: 'comments',
+      model: 'Comment',
+      select: 'content createdBy createDate'
+    };
+    Event.populate(event, options, function (error, event) {
+      if (error) {
+        reject({
+          result: false,
+          message: 'データベースエラー',
+          desc: error
+        });
+      }
+      console.log('eventPopulateComments...ok');
+      console.log(event);
+      resolve(event);
+    });
+  });
+}
+
+/**
+ * Attend情報からUser情報を補完します。
+ * @param {Attend} attend データベースから取得したAttend情報
+ * @return {Promise} User情報を補完したAttend情報
+ *
+ */
 function attendPopulateUser(attend) {
   return new Promise(function (resolve, reject) {
     var options = {
@@ -195,6 +310,35 @@ function attendPopulateUser(attend) {
   });
 }
 
+/**
+ * Comment情報からUser情報を補完します。
+ * @param {Comment} comment データベースから取得したComment情報
+ * @return {Promise} Comment情報が補完されたUser情報
+ * 
+ */
+function commentPopulateUser(comment) {
+  return new Promise(function (resolve, reject) {
+    var options = {
+      path: 'createdBy',
+      model: 'User',
+      select: 'username'
+    };
+
+    Comment.populate(comment, options, function (error, comment) {
+      if (error) {
+        reject({
+          result: false,
+          message: 'データベースエラー',
+          desc: error
+        });
+      }
+
+      console.log('commentPopulateUser...ok');
+      resolve(comment);
+    });
+  });
+}
+
 exports.getEventDetail = function (eventid) {
   var e = {};
   return new Promise(function (resolve, reject) {
@@ -204,38 +348,18 @@ exports.getEventDetail = function (eventid) {
         e = event.toObject();
         console.log('getEventDetail...ok');
 
-        // attend
-        return new Promise(function (resolve, reject) {
-          eventPopulateAttend(event)
-            .then(function (attend) {
-              return attendPopulateUser(attend);
-            })
-            .then(function (attend) {
-              var attends = [],
-                  cancels = [];
-              _.each(attend, function (elm, idx) {
-                var obj = {
-                  username: elm.userid.username,
-                  userid: elm.userid._id,
-                  comment: elm.comment,
-                  updateDate: elm.updateDate
-                };
-                if (elm.attendtype === 'attend') {
-                  attends.push(obj);
-                }
-                else {
-                  cancels.push(obj);
-                }
-              });
-              e.attends = attends;
-              e.cancels = cancels;
-              resolve();
-            })
-            .catch(function (error) {
-              reject(error);
-            });
-          ;
-        });
+	return new Promise(function (resolve, reject) {
+	  getComments(event)
+	    .then(function (result) {
+	      e.comments = result.comments;
+	      return getAttends(event);
+	    })
+	    .then(function (result) {
+	      e.attends = result.attends;
+	      e.cancels = result.cancels;
+	      resolve();
+	    });
+	});
       })
       .then(function () {
         return UserDAO.getUsername(e.createdBy);
@@ -250,10 +374,6 @@ exports.getEventDetail = function (eventid) {
       });
   });
 };
-    
-
-
-
 
 
 exports.regist = function (data) {
@@ -524,3 +644,33 @@ exports.entryuser = function (userid, attend) {
   });
 };
 
+
+/**
+ * コメント情報の作成
+ */
+exports.createComment = function (userid, comment) {
+  var now = (new Date()).toFormat('YYYY/MM/DD HH24:MI:SS');
+  console.log("createComment");
+  console.log("userid:" + userid);
+  console.log("comment:" + comment);
+  return CommentDAO.insert(userid, comment);
+};
+
+/**
+ * コメント情報の登録
+ */
+exports.entryComment = function (eventid, comment) {
+  console.log("entryComment");
+  return new Promise(function (resolve, reject) {
+    EventDAO.getEvent(eventid)
+      .then(function (event) {
+	event.comments.push(comment);
+	event.save();
+
+	resolve();
+      })
+      .catch(function (error) {
+	reject(error);
+      });
+  });
+};
