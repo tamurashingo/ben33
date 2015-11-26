@@ -147,6 +147,12 @@ router.post('/cancel', controller.cancel);
 router.post('/', auth.isAuthenticated);
 router.put('/edit', controller.edit);
 
+/**
+ * コメント登録
+ *
+ */
+router.post('/', auth.isAuthenticated);
+router.post('/comment', controller.comment);
 
 module.exports = router;
 

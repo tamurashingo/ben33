@@ -11,6 +11,12 @@
         <button class="btn btn-raised btn-material-blue-900" ng-show="iseditable" ng-click="edit()">
           イベント情報の修正
         </button>
+	<span ng-show="islogin">
+	  <hr />
+	  <textarea class="form-control" rows="3" ng-model="comment" id="comment"></textarea>
+	  <br />
+	  <button type="button" class="btn btn-primary" style="width: 80%;" ng-click="entryComment()">コメントを追加</button>
+	</span>
       </div>
     </div><!-- col-md-8 -->
 

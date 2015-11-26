@@ -70,3 +70,19 @@ exports.getAttend = function (eventid) {
   });
 };
 
+exports.getComments = function (eventid) {
+  return new Promise(function (resolve, reject) {
+    getEvent(eventid)
+      .then(function (event) {
+	resolve(event.comments);
+      })
+      .catch(function (error) {
+	reject(error);
+      });
+  });
+};
+
+  
+
+
+    

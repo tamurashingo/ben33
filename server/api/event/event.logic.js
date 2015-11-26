@@ -34,11 +34,13 @@
 var Event = require('./event.model');
 var Attend = require('./attend.model');
 var User = require('../user/user.model');
+var Comment = require('./comment.model');
 var Promise = require('bluebird');
 var _ = require('lodash');
 var EventDAO = require('./event.dao');
 var AttendDAO = require('./attend.dao');
 var UserDAO = require('../user/user.dao');
+var CommentDAO = require('./comment.dao');
 
 require('date-utils');
 
@@ -143,14 +145,66 @@ function getEvent(eventid) {
   });
 }
 
-/**
- *
- *
- *
- *
- *
- *
- */
+function getComments(event) {
+  return new Promise(function (resolve, reject) {
+    eventPopulateComments(event)
+      .then(function (comment) {
+	return commentPopulateUser(comment);
+      })
+      .then(function (comment) {
+        var comments = [];
+	_.each(comment, function (elm, idx) {
+	  var obj = {
+	    username: elm.userid.username,
+	    comment: elm.comment,
+	    createDate: elm.createDate
+	  };
+	  comments.push(obj);
+	});
+	resolve({
+	  comments: comments
+	});
+      })
+      .catch(function (error) {
+	reject(error);
+      });
+  });
+}
+
+function getAttends(event) {
+  return new Promise(function (resolve, reject) {
+    eventPopulateAttend(event)
+      .then(function (attend) {
+	return attendPopulateUser(attend);
+      })
+      .then(function (attend) {
+	var attends = [],
+	    cancels = [];
+	_.each(attend, function (elm, idx) {
+	  var obj = {
+            username: elm.userid.username,
+            userid: elm.userid._id,
+            comment: elm.comment,
+            updateDate: elm.updateDate
+          };
+          if (elm.attendtype === 'attend') {
+            attends.push(obj);
+          }
+          else {
+            cancels.push(obj);
+          }
+	});
+	resolve({
+	  attends: attends,
+	  cancels: cancels
+	});
+      })
+      .catch(function (error) {
+	reject(error);
+      });
+  });
+};
+
 function eventPopulateAttend(event) {
   return new Promise(function (resolve, reject) {
     var options = {
@@ -168,6 +222,27 @@ function eventPopulateAttend(event) {
       }
       console.log('eventPopulateAttend...ok');
       resolve(event.attends);
+    });
+  });
+}
+
+function eventPopulateComments(event) {
+  return new Promise(function (resolve, reject) {
+    var options = {
+      path: 'comments',
+      model: 'Comment',
+      select: 'comment createdBy updateDate'
+    };
+    Event.populate(event, options, function (error, event) {
+      if (error) {
+	reject({
+	  result: false,
+	  message: 'データベースエラー',
+	  desc: error
+	});
+      }
+      console.log('eventPopulateComments...ok');
+      resolve(event.comments);
     });
   });
 }
@@ -195,6 +270,29 @@ function attendPopulateUser(attend) {
   });
 }
 
+function commentPopulateUser(comment) {
+  return new Promise(function (resolve, reject) {
+    var options = {
+      path: 'createdBy',
+      model: 'User',
+      select: 'username'
+    };
+
+    Comment.populate(comment, options, function (error, comment) {
+      if (error) {
+	reject({
+	  result: false,
+	  message: 'データベースエラー',
+	  desc: error
+	});
+      }
+
+      console.log('commentPopulateUser...ok');
+      resolve(comment);
+    });
+  });
+}
+
 exports.getEventDetail = function (eventid) {
   var e = {};
   return new Promise(function (resolve, reject) {
@@ -204,38 +302,18 @@ exports.getEventDetail = function (eventid) {
         e = event.toObject();
         console.log('getEventDetail...ok');
 
-        // attend
-        return new Promise(function (resolve, reject) {
-          eventPopulateAttend(event)
-            .then(function (attend) {
-              return attendPopulateUser(attend);
-            })
-            .then(function (attend) {
-              var attends = [],
-                  cancels = [];
-              _.each(attend, function (elm, idx) {
-                var obj = {
-                  username: elm.userid.username,
-                  userid: elm.userid._id,
-                  comment: elm.comment,
-                  updateDate: elm.updateDate
-                };
-                if (elm.attendtype === 'attend') {
-                  attends.push(obj);
-                }
-                else {
-                  cancels.push(obj);
-                }
-              });
-              e.attends = attends;
-              e.cancels = cancels;
-              resolve();
-            })
-            .catch(function (error) {
-              reject(error);
-            });
-          ;
-        });
+	return new Promise(function (resolve, reject) {
+	  getComments(event)
+	    .then(function (result) {
+	      e.comments = result.comments;
+	      return getAttends(event);
+	    })
+	    .then(function (result) {
+	      e.attends = result.attends;
+	      e.cancels = result.cancels;
+	      resolve();
+	    });
+	});
       })
       .then(function () {
         return UserDAO.getUsername(e.createdBy);
@@ -250,10 +328,6 @@ exports.getEventDetail = function (eventid) {
       });
   });
 };
-    
-
-
-
 
 
 exports.regist = function (data) {
@@ -524,3 +598,30 @@ exports.entryuser = function (userid, attend) {
   });
 };
 
+
+/**
+ * コメント情報の作成
+ */
+exports.createComment = function (userid, comment) {
+  var now = (new Date()).toFormat('YYYY/MM/DD HH24:MI:SS');
+
+  return CommentDAO.insert(userid, comment);
+};
+
+/**
+ * コメント情報の登録
+ */
+exports.entryComment = function (eventid, comment) {
+  return new Promise(function (resolve, reject) {
+    EventDAO.getEvent(eventid)
+      .then(function (event) {
+	event.comments.push(comment);
+	event.save();
+
+	resolve();
+      })
+      .catch(function (error) {
+	reject(error);
+      });
+  });
+};

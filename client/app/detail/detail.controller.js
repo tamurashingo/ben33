@@ -10,6 +10,8 @@ angular.module('ben33App')
     $scope.isentried = false;
     /** 修正可能かどうか */
     $scope.iseditable = false;
+    /** ログインしているかどうか */
+    $scope.islogin = false;
     
     /**
      * 初期画面読み込み
@@ -25,16 +27,26 @@ angular.module('ben33App')
           console.log('load');
           console.log(data.event);
 
+	  /*-
+	   * ログインチェック
+	   */
+	  $scope.islogin = Auth.isLoggedIn();
+
           /*-
            * エントリー済みのチェック
            */
-          angular.forEach(data.event.attends, function (elm, idx) {
-            console.log('elm:' + elm.userid);
-            console.log('userid:' + userid);
-            if (elm.userid === userid) {
-              $scope.isentried = true;
-            }
-          });
+	  if (Auth.isLoggedIn()) {
+            angular.forEach(data.event.attends, function (elm, idx) {
+              console.log('elm:' + elm.userid);
+              console.log('userid:' + userid);
+              if (elm.userid === userid) {
+		$scope.isentried = true;
+              }
+            });
+	  }
+	  else {
+	    $scope.isentried = false;
+	  }
 
           /*-
            * 修正可能のチェック
@@ -63,6 +75,29 @@ angular.module('ben33App')
 
     $scope.back = function (eventId) {
       $location.path('/detail/' + eventId);
+    };
+
+    $scope.entryComment = function () {
+      var userid = Auth.getUserid();
+      console.log('userid:' + userid);
+      detailService.entryComment(eventId, userid, $scope.comment)
+        .then(function (data, status, headers, config) {
+	  console.log('結果が返ってきました');
+	  console.log(data);
+	  if (angular.isDefined(data.result) && data.result) {
+	    // ok
+	    growl.addSuccessMessage(data.message, {ttl: 5000});
+	    $timeout(function () {
+	      $scope.load();
+	    }, 500);
+	  }
+	  else {
+	    growl.addErrorMessage(data.message, {ttl: 5000});
+	  }
+	})
+	.catch(function (data, status, headers, config) {
+	  growl.addErrorMessage('サーバエラーが発生しました', {ttl: -1});
+	});
     };
 
     /*-

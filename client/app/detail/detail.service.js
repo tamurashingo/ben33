@@ -138,11 +138,30 @@ angular.module('ben33App')
     }
 
 
+    function entryComment(eventId, userId, comment) {
+      var res = $q.defer();
+      $http.post('/api/event/comment', {
+        eventid: eventId,
+        userid: userId,
+        comment: comment
+      })
+        .success(function (data, status, headers, config) {
+          res.resolve(data);
+        })
+        .error(function (data, status, headers, config) {
+          res.reject();
+        });
+
+      return res.promise;
+    }
+
     return {
       view: view,
       entryEvent: entryEvent,
-      cancelEvent: cancelEvent
+      cancelEvent: cancelEvent,
+      entryComment: entryComment
     };
-    
+
+
   }])
 ;

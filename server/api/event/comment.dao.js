@@ -25,47 +25,59 @@
  *
  */
 
-var mongoose = require('mongoose'),
-    Schema = mongoose.Schema,
-    AttendSchema = require('./attend.model');
+var Comment = require('./comment.model');
+var Promise = require('bluebird');
 
 
-/**
- * イベント情報
- */
-var EventSchema = new Schema({
-  /** イベント名 */
-  eventName: String,
-  /** 開始日時 */
-  startDate: String,
-  /** 終了日時 */
-  endDate: String,
+function getComment(commentid) {
+  return new Promise(function (resolve, reject) {
+    Comment.findById(commentid)
+      .exec(function (error, comment) {
+	if (error) {
+	  reject({
+	    result: false,
+	    message: 'データベースエラー',
+	    desc: error
+	  });
+	}
 
-  /** 開催場所 */
-  venue: String,
+	if (!comment) {
+	  reject({
+	    result: false,
+	    message: 'コメントが見つかりません',
+	    desc: ''
+	  });
+	}
+	resolve(comment);
+      });
+  });
+}
 
-  /** イベント参加者情報 */
-  attends: [{type: Schema.ObjectId, ref: 'Attend'}],
+exports.getComment = function (commentid) {
+  return getComment(commentid);
+};
 
-  /** イベント概要 */
-  abstraction: String,
-  /** イベント詳細 */
-  comment: String,
+exports.insert = function (userid, comment) {
+  var now = (new Date()).toFormat('YYYY/MM/DD HH24:MI:SS'),
+      data = {
+	comment: comment,
+	createdBy: userid,
+	updateDate: now
+      };
 
-  /** イベント作成者情報 */
-  createdBy: {
-    type: Schema.ObjectId,
-    ref: 'User'
-  },
+  return new Promise(function (resolve, reject) {
+    Comment.insert(data)
+      .exec(function (error, comment) {
+	if (error) {
+	  reject({
+	    result: false,
+	    message: 'データベースエラー',
+	    desc: error
+	  });
+	}
 
-  /** コメント */
-  comments: [{type: Schema.ObjectId, ref: 'Comment'}],
-
-  /** イベント情報作成日時 */
-  createDate: Date,
-  /** イベント情報更新日時 */
-  updateDate: Date
-});
-
-module.exports = mongoose.model('Event', EventSchema);
-
+	resolve(comment);
+      });
+  });
+	
+};
