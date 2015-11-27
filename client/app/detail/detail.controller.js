@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('ben33App')
-  .controller('DetailCtrl', ['$scope', '$stateParams', '$location', 'detailService', 'Auth', 'growl', function ($scope, $stateParams, $location, detailService, Auth, growl) {
+  .controller('DetailCtrl', ['$scope', '$stateParams', '$location', '$timeout', 'detailService', 'Auth', 'growl', function ($scope, $stateParams, $location, $timeout, detailService, Auth, growl) {
     var eventId = $stateParams.eventId;
 
     /** イベント詳細 */
@@ -27,26 +27,26 @@ angular.module('ben33App')
           console.log('load');
           console.log(data.event);
 
-	  /*-
-	   * ログインチェック
-	   */
-	  $scope.islogin = Auth.isLoggedIn();
+          /*-
+           * ログインチェック
+           */
+          $scope.islogin = Auth.isLoggedIn();
 
           /*-
            * エントリー済みのチェック
            */
-	  if (Auth.isLoggedIn()) {
+          if (Auth.isLoggedIn()) {
             angular.forEach(data.event.attends, function (elm, idx) {
               console.log('elm:' + elm.userid);
               console.log('userid:' + userid);
               if (elm.userid === userid) {
-		$scope.isentried = true;
+                $scope.isentried = true;
               }
             });
-	  }
-	  else {
-	    $scope.isentried = false;
-	  }
+          }
+          else {
+            $scope.isentried = false;
+          }
 
           /*-
            * 修正可能のチェック
@@ -82,22 +82,23 @@ angular.module('ben33App')
       console.log('userid:' + userid);
       detailService.entryComment(eventId, userid, $scope.comment)
         .then(function (data, status, headers, config) {
-	  console.log('結果が返ってきました');
-	  console.log(data);
-	  if (angular.isDefined(data.result) && data.result) {
-	    // ok
-	    growl.addSuccessMessage(data.message, {ttl: 5000});
-	    $timeout(function () {
-	      $scope.load();
-	    }, 500);
-	  }
-	  else {
-	    growl.addErrorMessage(data.message, {ttl: 5000});
-	  }
-	})
-	.catch(function (data, status, headers, config) {
-	  growl.addErrorMessage('サーバエラーが発生しました', {ttl: -1});
-	});
+          console.log('結果が返ってきました');
+          console.log(data);
+          if (angular.isDefined(data.result) && data.result) {
+            // ok
+            $scope.comment = '';
+            growl.addSuccessMessage(data.message, {ttl: 5000});
+            $timeout(function () {
+              $scope.load();
+            }, 500);
+          }
+          else {
+            growl.addErrorMessage(data.message, {ttl: 5000});
+          }
+        })
+        .catch(function (data, status, headers, config) {
+          growl.addErrorMessage('サーバエラーが発生しました', {ttl: -1});
+        });
     };
 
     /*-

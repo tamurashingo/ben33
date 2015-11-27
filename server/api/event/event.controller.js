@@ -185,21 +185,21 @@ exports.comment = function (req, res) {
       userid = req.body.userid,
       comment = req.body.comment;
 
-  logic.createComment(eventid, userid, comment)
+  logic.createComment(userid, comment)
     .then(function (comment) {
       return logic.entryComment(eventid, comment);
     })
     .then(function (result) {
       res.json({
-	result: true,
-	message: 'コメントを追加しました'
+        result: true,
+        message: 'コメントを追加しました'
       });
     })
     .catch(function (error) {
       res.json({
-	result: false,
-	message: 'コメントの追加に失敗しました',
-	error: error
+        result: false,
+        message: 'コメントの追加に失敗しました',
+        error: error
       });
     });
 };

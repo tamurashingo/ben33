@@ -122,7 +122,7 @@ function convertRows(rows) {
 function getEvent(eventid) {
   return new Promise(function (resolve, reject) {
     Event.findById(eventid,
-      'eventName startDate endDate venue attends abstraction comment createdBy createDate updateDate')
+      'eventName startDate endDate venue attends comments abstraction comment createdBy createDate updateDate')
       .exec(function (error, event) {
         if (error) {
           reject({
@@ -145,43 +145,65 @@ function getEvent(eventid) {
   });
 }
 
+/**
+ * Event情報からCommentの情報を取得するPromiseを取得します。
+ * @param {Event} event データベースから取得したEvent情報
+ * @return {Promise} resolve: commentsでCommentの配列を得る。
+ *                   reject: {Error}
+ * 
+ */
 function getComments(event) {
   return new Promise(function (resolve, reject) {
     eventPopulateComments(event)
-      .then(function (comment) {
-	return commentPopulateUser(comment);
+      .then(function (event) {
+        console.log('eventPopulateComments');
+        console.log(event);
+        return commentPopulateUser(event.comments);
       })
       .then(function (comment) {
         var comments = [];
-	_.each(comment, function (elm, idx) {
-	  var obj = {
-	    username: elm.userid.username,
-	    comment: elm.comment,
-	    createDate: elm.createDate
-	  };
-	  comments.push(obj);
-	});
-	resolve({
-	  comments: comments
-	});
-      })
-      .catch(function (error) {
-	reject(error);
+        console.log('commentPopulateUser');
+        console.log(comment);
+        _.each(comment, function (elm, idx) {
+          console.log('user');
+          console.log(elm);
+          var obj = {
+            username: elm.createdBy.username,
+            userid: elm.createdBy._id,
+            comment: elm.content,
+            createDate: elm.createDate.toFormat('YYYY/MM/DD HH24:MI')
+          };
+        comments.push(obj);
       });
+      
+      resolve({
+        comments: comments
+      });
+    })
+    .catch(function (error) {
+      reject(error);
+    });
   });
 }
 
+/**
+ * Event情報から参加者、キャンセル者の情報を取得するPromiseを取得します。
+ * @param {Event} event データベースから取得したEvent情報
+ * @return {Promise} resolve: attendsで参加者情報を、cancelsでキャンセル者情報を得る。
+ *                   reject: {Error} 
+ * 
+ */
 function getAttends(event) {
   return new Promise(function (resolve, reject) {
     eventPopulateAttend(event)
-      .then(function (attend) {
-	return attendPopulateUser(attend);
+      .then(function (event) {
+        return attendPopulateUser(event.attends);
       })
       .then(function (attend) {
-	var attends = [],
-	    cancels = [];
-	_.each(attend, function (elm, idx) {
-	  var obj = {
+        var attends = [],
+            cancels = [];
+        _.each(attend, function (elm, idx) {
+          var obj = {
             username: elm.userid.username,
             userid: elm.userid._id,
             comment: elm.comment,
@@ -193,18 +215,24 @@ function getAttends(event) {
           else {
             cancels.push(obj);
           }
-	});
-	resolve({
-	  attends: attends,
-	  cancels: cancels
-	});
+        });
+        resolve({
+          attends: attends,
+          cancels: cancels
+        });
       })
       .catch(function (error) {
-	reject(error);
+        reject(error);
       });
   });
 };
 
+/**
+ * Event情報からAttend情報の配列を補完します。
+ * @param {Event} event データベースから取得したEvent情報
+ * @return {Promise} Attend情報の配列が補完されたEvent情報
+ * 
+ */
 function eventPopulateAttend(event) {
   return new Promise(function (resolve, reject) {
     var options = {
@@ -221,32 +249,44 @@ function eventPopulateAttend(event) {
         });
       }
       console.log('eventPopulateAttend...ok');
-      resolve(event.attends);
+      resolve(event);
     });
   });
 }
 
+/**
+ * Event情報からComment情報の配列を取得します。
+ * @param {Event} event データベースから取得したEvent情報
+ * @return {Promise} Comment情報を補完したEvent情報を得るPromise
+ */
 function eventPopulateComments(event) {
   return new Promise(function (resolve, reject) {
     var options = {
       path: 'comments',
       model: 'Comment',
-      select: 'comment createdBy updateDate'
+      select: 'content createdBy createDate'
     };
     Event.populate(event, options, function (error, event) {
       if (error) {
-	reject({
-	  result: false,
-	  message: 'データベースエラー',
-	  desc: error
-	});
+        reject({
+          result: false,
+          message: 'データベースエラー',
+          desc: error
+        });
       }
       console.log('eventPopulateComments...ok');
-      resolve(event.comments);
+      console.log(event);
+      resolve(event);
     });
   });
 }
 
+/**
+ * Attend情報からUser情報を補完します。
+ * @param {Attend} attend データベースから取得したAttend情報
+ * @return {Promise} User情報を補完したAttend情報
+ *
+ */
 function attendPopulateUser(attend) {
   return new Promise(function (resolve, reject) {
     var options = {
@@ -270,6 +310,12 @@ function attendPopulateUser(attend) {
   });
 }
 
+/**
+ * Comment情報からUser情報を補完します。
+ * @param {Comment} comment データベースから取得したComment情報
+ * @return {Promise} Comment情報が補完されたUser情報
+ * 
+ */
 function commentPopulateUser(comment) {
   return new Promise(function (resolve, reject) {
     var options = {
@@ -280,11 +326,11 @@ function commentPopulateUser(comment) {
 
     Comment.populate(comment, options, function (error, comment) {
       if (error) {
-	reject({
-	  result: false,
-	  message: 'データベースエラー',
-	  desc: error
-	});
+        reject({
+          result: false,
+          message: 'データベースエラー',
+          desc: error
+        });
       }
 
       console.log('commentPopulateUser...ok');
@@ -604,7 +650,9 @@ exports.entryuser = function (userid, attend) {
  */
 exports.createComment = function (userid, comment) {
   var now = (new Date()).toFormat('YYYY/MM/DD HH24:MI:SS');
-
+  console.log("createComment");
+  console.log("userid:" + userid);
+  console.log("comment:" + comment);
   return CommentDAO.insert(userid, comment);
 };
 
@@ -612,6 +660,7 @@ exports.createComment = function (userid, comment) {
  * コメント情報の登録
  */
 exports.entryComment = function (eventid, comment) {
+  console.log("entryComment");
   return new Promise(function (resolve, reject) {
     EventDAO.getEvent(eventid)
       .then(function (event) {

@@ -32,17 +32,17 @@ var mongoose = require('mongoose'),
  * コメント
  */
 var CommentSchema = new Schema({
-   /** コメント内容 */
-    content: String,
+  /** コメント内容 */
+  content: String,
 
-   /** コメントした人 */
-   createdBy: {
-     type: Schema.ObjectId,
-     ref: 'User'
-   },
+  /** コメントした人 */
+  createdBy: {
+    type: Schema.ObjectId,
+    ref: 'User'
+  },
 
-   /** コメント日時 */
-   createDate: Date
+  /** コメント日時 */
+  createDate: Date
 });
 
 module.exports = mongoose.model('Comment', CommentSchema);    

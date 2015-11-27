@@ -33,22 +33,22 @@ function getComment(commentid) {
   return new Promise(function (resolve, reject) {
     Comment.findById(commentid)
       .exec(function (error, comment) {
-	if (error) {
-	  reject({
-	    result: false,
-	    message: 'データベースエラー',
-	    desc: error
-	  });
-	}
+        if (error) {
+          reject({
+            result: false,
+            message: 'データベースエラー',
+            desc: error
+          });
+        }
 
-	if (!comment) {
-	  reject({
-	    result: false,
-	    message: 'コメントが見つかりません',
-	    desc: ''
-	  });
-	}
-	resolve(comment);
+        if (!comment) {
+          reject({
+            result: false,
+            message: 'コメントが見つかりません',
+            desc: ''
+          });
+        }
+        resolve(comment);
       });
   });
 }
@@ -60,24 +60,30 @@ exports.getComment = function (commentid) {
 exports.insert = function (userid, comment) {
   var now = (new Date()).toFormat('YYYY/MM/DD HH24:MI:SS'),
       data = {
-	comment: comment,
-	createdBy: userid,
-	updateDate: now
+        content: comment,
+        createdBy: userid,
+        createDate: now
       };
+      
+  console.log("comment insert");
+  console.log(data);
 
   return new Promise(function (resolve, reject) {
-    Comment.insert(data)
-      .exec(function (error, comment) {
-	if (error) {
-	  reject({
-	    result: false,
-	    message: 'データベースエラー',
-	    desc: error
-	  });
-	}
-
-	resolve(comment);
-      });
+    Comment.create(data, function (error, comment) {
+      if (error) {
+        console.log("error!");
+        console.log(error);
+        reject({
+          result: false,
+          message: 'データベースエラー',
+          desc: error
+        });
+      }
+      else {
+        console.log("ok!");
+        console.log(comment);
+        resolve(comment);
+      }
+    });
   });
-	
 };
