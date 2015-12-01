@@ -222,8 +222,8 @@ module.exports = function (grunt) {
       dist: {
         files: {
           src: [
-            '<%= yeoman.dist %>/public/{,*/}*.js',
-            '<%= yeoman.dist %>/public/{,*/}*.css',
+            '<%= yeoman.dist %>/public/assets/*.js',
+            '<%= yeoman.dist %>/public/assets/*.css',
             '<%= yeoman.dist %>/public/assets/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
             '<%= yeoman.dist %>/public/assets/fonts/*'
           ]
@@ -243,21 +243,48 @@ module.exports = function (grunt) {
 
     // Performs rewrites based on rev and the useminPrepare configuration
     usemin: {
-      html: ['<%= yeoman.dist %>/public/{,*/}*.html'],
-      css: ['<%= yeoman.dist %>/public/{,*/}*.css'],
-      js: ['<%= yeoman.dist %>/public/{,*/}*.js'],
+      html: [
+        '<%= yeoman.dist %>/public//*.html',
+        '<%= yeoman.dist %>/public/**/*.html'
+        ],
+      css: ['<%= yeoman.dist %>/public/assets/css/*.css'],
+      js: ['<%= yeoman.dist %>/public/assets/{,*/}*.js'],
       options: {
         assetsDirs: [
-          '<%= yeoman.dist %>/public',
-          '<%= yeoman.dist %>/public/assets/images'
+          '<%= yeoman.dist %>/public'
         ],
         // This is so we update image references in our ng-templates
         patterns: {
+          html: [
+            [
+              /(assets\/images\/.*?\.(?:gif|jpeg|jpg|png|webp|svg))/gm,
+              'Update the HTML to reference our revved images',
+              function (match) {
+                return match.replace('/assets/', '');
+              }
+            ],
+            [
+              /(assets\/css\/.*?\.css)/gm,
+              'Update the HTML to reference our revved css',
+              function (match) {
+                return match.replace('/assets/', '');
+              }
+            ]
+          ],
           js: [
             [/(assets\/images\/.*?\.(?:gif|jpeg|jpg|png|webp|svg))/gm, 'Update the JS to reference our revved images']
           ],
           css: [
-            [/()/g, 'Rplacing reference to FontFile']
+            [
+              /(\.\.\/fonts\/.*?\.(::eot|svg|ttf|woff))/gm,
+              'Replace revved FontFile',
+              function (match) {
+                return match.replace('../fonts', 'assets/fonts');
+              },
+              function (file) {
+                return file.replace('assets/fonts', '../fonts');
+              }
+            ]
           ]
         }
       }
