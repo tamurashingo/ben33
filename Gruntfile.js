@@ -222,8 +222,8 @@ module.exports = function (grunt) {
       dist: {
         files: {
           src: [
-            '<%= yeoman.dist %>/public/assets/*.js',
-            '<%= yeoman.dist %>/public/assets/*.css',
+            '<%= yeoman.dist %>/public/assets/script/*.js',
+            '<%= yeoman.dist %>/public/assets/css/*.css',
             '<%= yeoman.dist %>/public/assets/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
             '<%= yeoman.dist %>/public/assets/fonts/*'
           ]
@@ -244,7 +244,7 @@ module.exports = function (grunt) {
     // Performs rewrites based on rev and the useminPrepare configuration
     usemin: {
       html: [
-        '<%= yeoman.dist %>/public//*.html',
+        '<%= yeoman.dist %>/public/*.html',
         '<%= yeoman.dist %>/public/**/*.html'
         ],
       css: ['<%= yeoman.dist %>/public/assets/css/*.css'],
@@ -269,6 +269,13 @@ module.exports = function (grunt) {
               function (match) {
                 return match.replace('/assets/', '');
               }
+            ],
+            [
+              /(assets\/script\/.*?\.js)/gm,
+              'Update the HTML to reference our revved js',
+              function (match) {
+                return match.replace('/assets/', '');
+              }
             ]
           ],
           js: [
@@ -276,7 +283,7 @@ module.exports = function (grunt) {
           ],
           css: [
             [
-              /(\.\.\/fonts\/.*?\.(::eot|svg|ttf|woff))/gm,
+              /(\.\.\/fonts\/.*?\.(?:eot|svg|ttf|woff))/gm,
               'Replace revved FontFile',
               function (match) {
                 return match.replace('../fonts', 'assets/fonts');
