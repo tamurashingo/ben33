@@ -280,6 +280,9 @@ module.exports = function (grunt) {
               'Replace revved FontFile',
               function (match) {
                 return match.replace('../fonts', 'assets/fonts');
+              },
+              function (file) {
+                return file.replace('assets/fonts', '../fonts');
               }
             ]
           ]
